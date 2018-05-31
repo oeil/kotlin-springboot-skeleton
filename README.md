@@ -1,5 +1,7 @@
 # SpringBoot based Kotlin Standalone WebApp Skeleton
 
+This branch uses Undertow as web-server (servlet based)
+
 - Spring Boot (Embedded Web Server + REST)
 - Jackson
 - Logback
