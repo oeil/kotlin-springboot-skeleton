@@ -6,6 +6,7 @@ import org.springframework.boot.runApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.boot.ExitCodeGenerator
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.web.reactive.server.ConfigurableReactiveWebServerFactory
 import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory
 import org.springframework.stereotype.Component
@@ -26,9 +27,9 @@ class App() {
     }
 
     @Component
-    class CustomizationBean : WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
-        override fun customize(container: ConfigurableServletWebServerFactory) {
-            container.setPort((System.getProperty("port") ?: "8080").toInt())
+    class CustomizationBean : WebServerFactoryCustomizer<ConfigurableReactiveWebServerFactory> {
+        override fun customize(server: ConfigurableReactiveWebServerFactory) {
+            server.setPort((System.getProperty("port") ?: "8000").toInt())
         }
     }
 
