@@ -29,7 +29,7 @@ class App() {
     @Component
     class CustomizationBean : WebServerFactoryCustomizer<ConfigurableReactiveWebServerFactory> {
         override fun customize(server: ConfigurableReactiveWebServerFactory) {
-            server.setPort((System.getProperty("port") ?: "8000").toInt())
+            server.setPort((System.getProperty("port") ?: "8080").toInt())
         }
     }
 
