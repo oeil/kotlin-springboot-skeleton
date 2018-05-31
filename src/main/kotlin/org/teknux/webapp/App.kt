@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 
 
 @SpringBootApplication
-open class App() {
+class App() {
 
     private var context: ConfigurableApplicationContext? = null
 
