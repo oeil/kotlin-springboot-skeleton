@@ -6,9 +6,7 @@ This branch uses Netty as web-server with reactive (async) paradigm.
 - Jackson
 - Logback
 
-Different branches provide different Spring Boot implementation models
-- [netty-reactive-rest-webserver-advanced](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-rest-webserver-advanced) - Reactive REST Web Services with more advanced Spring concepts
-
+Those branches provide skeletons for Spring Boot apps based on different flavors:
 - [netty-reactive-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-webserver) Netty (embedded) - Reactive REST Web Services
 - [tomcat-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-rest-webserver) Tomcat (embedded) - Servlet based REST Web Services
 - [undertow-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/undertow-webserver) Undertow (embedded) - Servlet based REST Web Services
