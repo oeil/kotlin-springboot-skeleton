@@ -4,9 +4,13 @@
 - Jackson
 - Logback
 
-Different branches provide different Spring Boot implemntation models
-- [netty-reactive-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-webserver) Netty - Reactive based Web Server implementation
-- [undertow-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/undertow-webserver) Undertow - Servlet based Web Server implementation
+Different branches provide different Spring Boot implementation models
+- [netty-reactive-rest-webserver-advanced](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-rest-webserver-advanced) - Reactive REST Web Services with more advanced Spring concepts
+
+- [netty-reactive-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-webserver) Netty (embedded) - Reactive REST Web Services
+- [tomcat-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-rest-webserver) Tomcat (embedded) - Servlet based REST Web Services
+- [undertow-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/undertow-webserver) Undertow (embedded) - Servlet based REST Web Services
+
 
 ## Build Project
 ```
