@@ -21,17 +21,24 @@ class UserController {
     }
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable id: String): ResponseEntity<User> {
+    fun getUser(@PathVariable id: Int): ResponseEntity<User> {
         return storeService.getUser(id)?.let {
             ResponseEntity.ok(it)
         } ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
     @DeleteMapping("/{id}")
-    fun deleteUser(@PathVariable id: String): ResponseEntity<Unit> {
+    fun deleteUser(@PathVariable id: Int): ResponseEntity<Unit> {
         storeService.getUser(id)?.let {
             storeService.removeUser(id)
             return ResponseEntity(HttpStatus.OK)
         } ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+    }
+
+    @PostMapping
+    fun addUser(@RequestBody user: User): ResponseEntity<User> {
+        storeService.newUser(user)?.let {
+            return ResponseEntity.ok(user)
+        }
     }
 }

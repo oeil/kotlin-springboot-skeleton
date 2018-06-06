@@ -12,6 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
+import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
 
 
@@ -40,12 +41,14 @@ class App() {
     fun init(storeService: StoreService) = CommandLineRunner {
         LOGGER.info("### Init Data ..")
         for (n in 1..10) {
-            var user = storeService.newUser("user_$n")
+            var user = storeService.newUser(User(name = "user_$n"))
             LOGGER.info("${user.name} created : ${user.id}")
-            storeService.addAction(ClockAction(type = 1, desc = "clockin", user = user))
-            LOGGER.info("${user.name} clocked-in")
-            storeService.addAction(ClockAction(type = 0, desc = "clockout", user = user))
-            LOGGER.info("${user.name} clocked-out")
+            user.id?.let {
+                storeService.addAction(ClockAction(type = 1, desc = "clockin", userId = it))
+                LOGGER.info("${user.name} clocked-in")
+                storeService.addAction(ClockAction(type = 0, desc = "clockout", userId = it))
+                LOGGER.info("${user.name} clocked-out")
+            }
         }
         LOGGER.info("### Done Init Data")
     }

@@ -3,31 +3,39 @@ package org.teknux.webapp.service
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
+import java.time.LocalDateTime
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 
 @Service
 class StoreService {
 
-    private val usersMap: MutableMap<String, User> = ConcurrentHashMap()
-    private val actionsMap: MutableMap<User, Set<ClockAction>> = ConcurrentHashMap()
+    @Volatile
+    private var currentUsersIndex: AtomicInteger = AtomicInteger(0)
+    @Volatile
+    var currentActionsIndex: AtomicInteger = AtomicInteger(0)
+
+    private val usersMap: MutableMap<Int, User> = ConcurrentHashMap()
+    private val actionsMap: MutableMap<Int, MutableSet<ClockAction>> = ConcurrentHashMap()
 
     @Synchronized
-    fun newUser(name: String): User {
-        val user = User(name = name)
-        usersMap[user.id] = user
+    fun newUser(user: User): User {
+        user.id = currentUsersIndex.incrementAndGet();
+        user.id!!.let {
+            usersMap[it] = user
+        }
         return user
     }
 
     @Synchronized
-    fun removeUser(id: String) {
-        usersMap[id]?.let {
-            actionsMap.remove(it)
-            usersMap.remove(id)
-        }
+    fun removeUser(id: Int) {
+        actionsMap.remove(id)
+        usersMap.remove(id)
     }
 
-    fun getUser(id: String): User? {
+    fun getUser(id: Int): User? {
         return usersMap[id]
     }
 
@@ -37,7 +45,11 @@ class StoreService {
 
     @Synchronized
     fun addAction(action: ClockAction): ClockAction {
-        actionsMap[action.user] = actionsMap.getOrPut(action.user) { setOf() } + action
+        if (action.userId in usersMap) {
+            action.id = currentActionsIndex.incrementAndGet()
+            action.timestamp = LocalDateTime.now()
+            actionsMap[action.userId] = (actionsMap.getOrPut(action.userId) { mutableSetOf() } + action) as MutableSet
+        }
         return action
     }
 
@@ -46,7 +58,7 @@ class StoreService {
     }
 
     fun getActions(user: User): Set<ClockAction>? {
-        return actionsMap[user]
+        return actionsMap[user.id]
     }
 
 }

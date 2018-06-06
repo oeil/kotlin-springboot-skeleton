@@ -1,10 +1,8 @@
 package org.teknux.webapp.controller
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.service.StoreService
 
@@ -16,7 +14,7 @@ class ClockActionController {
     private lateinit var storeService: StoreService
 
     @GetMapping
-    fun getAll(@RequestParam userId: String?): Set<ClockAction> {
+    fun getAll(@RequestParam userId: Int?): Set<ClockAction> {
         userId?.let {
             storeService.getUser(it)?.let {
                 return storeService.getActions(it).orEmpty()
@@ -24,5 +22,14 @@ class ClockActionController {
         }
 
         return storeService.getActions().orEmpty()
+    }
+
+    @PostMapping
+    fun addAction(@RequestBody action: ClockAction): ResponseEntity<ClockAction> {
+        action!!.let {
+            it.userId!!.let {
+                return ResponseEntity.ok(storeService.addAction(action))
+            }
+        }
     }
 }
