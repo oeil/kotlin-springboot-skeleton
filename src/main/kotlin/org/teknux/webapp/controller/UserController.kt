@@ -38,7 +38,7 @@ class UserController {
     @PostMapping
     fun addUser(@RequestBody user: User): ResponseEntity<User> {
         storeService.newUser(user)?.let {
-            return ResponseEntity.ok(user)
+            return ResponseEntity.ok(it)
         }
     }
 }
