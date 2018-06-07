@@ -11,6 +11,8 @@ Those branches provide skeletons for Spring Boot apps based on different flavors
 - [tomcat-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-rest-webserver) Tomcat (embedded) - Servlet based REST Web Services
 - [undertow-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/undertow-webserver) Undertow (embedded) - Servlet based REST Web Services
 
+- [tomcat-graphql-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-graphql-rest-webserver) Tomcat (embedded) - GraphQL and REST Web Services
+
 
 ## Build Project
 ```
