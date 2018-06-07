@@ -1,16 +1,6 @@
 # SpringBoot based Kotlin Standalone WebApp Skeleton
 
-This branch uses Netty as web-server with reactive (async) paradigm.
-
-- Spring Boot (Embedded Web Server + REST)
-- Jackson
-- Logback
-
-Those branches provide skeletons for Spring Boot apps based on different flavors:
-- [netty-reactive-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/netty-reactive-webserver) Netty (embedded) - Reactive REST Web Services
-- [tomcat-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-rest-webserver) Tomcat (embedded) - Servlet based REST Web Services
-- [undertow-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/undertow-webserver) Undertow (embedded) - Servlet based REST Web Services
-
+This branch uses Tomcat as web-server and exposes REST and GraphQL web services.
 
 ## Build Project
 ```
@@ -20,4 +10,19 @@ mvn clean package
 ## Run Application
 ```
 java -jar target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+```
+
+## GraphQL playground on current schema
+```
+http://http://localhost:8080/graphiql
+```
+
+Query Users and ask for Id and Name for each:
+```
+{
+  users {
+    id
+    name
+  }
+}
 ```
