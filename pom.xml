@@ -24,6 +24,9 @@
         <spring-boot-starter.version>2.0.2.RELEASE</spring-boot-starter.version>
         <jackson-module-kotlin.version>2.9.5</jackson-module-kotlin.version>
 
+        <graphql-spring-boot-starter.version>4.2.0</graphql-spring-boot-starter.version>
+        <graphql-java-tools.version>5.2.0</graphql-java-tools.version>
+
         <junit.version>4.11</junit.version>
     </properties>
 
@@ -42,13 +45,29 @@
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot-starter.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
             <version>${jackson-module-kotlin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphiql-spring-boot-starter</artifactId>
+            <version>${graphql-spring-boot-starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-spring-boot-starter</artifactId>
+            <version>${graphql-spring-boot-starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-tools</artifactId>
+            <version>5.1.0</version>
         </dependency>
 
         <!-- Logs -->

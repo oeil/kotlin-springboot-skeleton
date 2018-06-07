@@ -11,6 +11,8 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import org.teknux.webapp.graphsql.resolver.Mutation
+import org.teknux.webapp.graphsql.resolver.Query
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
@@ -30,12 +32,14 @@ class App() {
         System.exit(exitCode)
     }
 
+    /*
     @Component
     class CustomizationBean : WebServerFactoryCustomizer<ConfigurableReactiveWebServerFactory> {
         override fun customize(server: ConfigurableReactiveWebServerFactory) {
             server.setPort((System.getProperty("port") ?: "8080").toInt())
         }
     }
+    */
 
     @Bean
     fun init(storeService: StoreService) = CommandLineRunner {
@@ -51,6 +55,16 @@ class App() {
             }
         }
         LOGGER.info("### Done Init Data")
+    }
+
+    @Bean
+    fun query(storeService: StoreService): Query {
+        return Query(storeService)
+    }
+
+    @Bean
+    fun mutation(storeService: StoreService): Mutation {
+        return Mutation(storeService)
     }
 
     companion object {

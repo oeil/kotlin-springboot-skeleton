@@ -40,8 +40,10 @@ class StoreService {
         } ?: throw IllegalArgumentException("User Id does not exist!")
     }
 
-    fun getUser(id: Int): User? {
-        return usersMap[id]
+    fun getUser(id: Int): User {
+        usersMap[id]?.let {
+            return it
+        } ?: throw IllegalArgumentException("Unknown User Id [${id}]!")
     }
 
     fun getUsers(): Iterable<User> {
