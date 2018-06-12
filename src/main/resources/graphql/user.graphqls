@@ -8,4 +8,11 @@ type Mutation {
 type User {
     id: ID!
     name: String!
+    clockActions: [ClockAction]
+}
+
+type ClockAction {
+    id: ID!
+    type: Int!
+    desc: String
 }

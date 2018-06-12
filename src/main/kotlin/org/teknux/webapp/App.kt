@@ -6,13 +6,11 @@ import org.springframework.boot.ExitCodeGenerator
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.boot.web.reactive.server.ConfigurableReactiveWebServerFactory
-import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
-import org.springframework.stereotype.Component
 import org.teknux.webapp.graphsql.resolver.Mutation
 import org.teknux.webapp.graphsql.resolver.Query
+import org.teknux.webapp.graphsql.resolver.UserResolver
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
@@ -58,6 +56,11 @@ class App() {
     }
 
     @Bean
+    fun userResolver(storeService: StoreService): UserResolver {
+        return UserResolver(storeService)
+    }
+
+    @Bean
     fun query(storeService: StoreService): Query {
         return Query(storeService)
     }
@@ -66,6 +69,8 @@ class App() {
     fun mutation(storeService: StoreService): Mutation {
         return Mutation(storeService)
     }
+
+
 
     companion object {
 
