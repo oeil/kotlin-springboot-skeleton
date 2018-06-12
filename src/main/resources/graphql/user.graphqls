@@ -8,11 +8,12 @@ type Mutation {
 type User {
     id: ID!
     name: String!
-    clockActions: [ClockAction]
+    clockActions(type: Int, containsDesc: String) : [ClockAction]
 }
 
 type ClockAction {
     id: ID!
     type: Int!
     desc: String
+    timestamp: String!
 }
