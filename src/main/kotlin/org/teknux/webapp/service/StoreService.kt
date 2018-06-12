@@ -6,7 +6,6 @@ import org.teknux.webapp.model.User
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.function.Consumer
 import java.util.stream.Collectors
 
 @Service
@@ -67,8 +66,12 @@ class StoreService {
         return actionsMap.values.stream().flatMap(Set<ClockAction>::stream).collect(Collectors.toSet())
     }
 
-    fun getActions(user: User): Set<ClockAction>? {
-        return actionsMap[user.id]
+    fun getActions(user: User?): Set<ClockAction>? {
+        return user?.let { actionsMap[user.id] } ?: getActions()
+    }
+
+    fun getLastAction(user: User): ClockAction {
+        return getActions(user).orEmpty().sortedByDescending { it.timestamp }.first()
     }
 
 }

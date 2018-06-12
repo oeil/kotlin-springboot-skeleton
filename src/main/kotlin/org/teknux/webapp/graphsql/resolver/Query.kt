@@ -13,7 +13,13 @@ class Query(private val storeService: StoreService): GraphQLQueryResolver {
         } ?: return storeService.getUsers()
     }
 
-    fun getClockActions(user: User): Iterable<ClockAction> {
-        return storeService.getActions(user).orEmpty()
+    fun clockActions(userId: Int?): Iterable<ClockAction> {
+        return userId?.let {
+            storeService.getActions(storeService.getUser(it)).orEmpty()
+        } ?: storeService.getActions().orEmpty()
+    }
+
+    fun lastClockAction(userId: Int): ClockAction {
+        return storeService.getLastAction(storeService.getUser(userId))
     }
 }
