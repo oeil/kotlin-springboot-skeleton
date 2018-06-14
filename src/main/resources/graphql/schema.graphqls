@@ -1,12 +1,14 @@
 type Query {
+    offices(id: Int): [Office]!
     users(id: Int): [User]!
     clockActions(userId: Int): [ClockAction]!
     lastClockAction(userId: Int): ClockAction!
 }
 type Mutation {
     user(name: String!) : User!
-    clockIn(userId: Int!, desc:String): ClockAction
-    clockOut(userId: Int!, desc:String): ClockAction
+    office(name: String!) : Office!
+    clockIn(userId: Int!, desc:String, officeId:Int): ClockAction
+    clockOut(userId: Int!, desc:String, officeId:Int): ClockAction
 }
 
 type User {
@@ -20,4 +22,10 @@ type ClockAction {
     type: Int!
     desc: String
     timestamp: String!
+    office: Office!
+}
+
+type Office {
+    id: ID!
+    name: String!
 }

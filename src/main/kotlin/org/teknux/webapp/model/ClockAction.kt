@@ -1,6 +1,5 @@
 package org.teknux.webapp.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
 
 data class ClockAction(
@@ -8,5 +7,6 @@ data class ClockAction(
         var timestamp: LocalDateTime? = null,
         var type: Int,
         var desc: String = "",
-        val userId: Int
+        val userId: Int,
+        val officeId: Int?
 )

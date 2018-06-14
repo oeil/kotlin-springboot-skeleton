@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
+import org.teknux.webapp.model.Office
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
 
@@ -14,12 +15,17 @@ class Query(private val storeService: StoreService) : GraphQLQueryResolver {
         private val LOGGER = LoggerFactory.getLogger(Query::class.java)
     }
 
+    fun offices(id: Int?): Iterable<Office> {
+        LOGGER.debug("[GraphQL QUERY] offices(id=$id)")
+        return storeService.getOffices(id?.let { setOf(id) })
+    }
+
     fun users(id: Int?): Iterable<User> {
         LOGGER.debug("[GraphQL QUERY] users(id=$id)")
 
-        id?.let {
-            return setOf(storeService.getUser(id))
-        } ?: return storeService.getUsers()
+        return id?.let {
+            setOf(storeService.getUser(id))
+        } ?: storeService.getUsers()
     }
 
     fun clockActions(userId: Int?): Iterable<ClockAction> {

@@ -29,7 +29,7 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
      * @param storeService the service used to access data
      */
     fun getClockActions(user: User, type: Int?, containsDesc: String?): CompletableFuture<List<ClockAction>> {
-        LOGGER.info("[GraphQL Resolver] getClockActions(user=[$user] type=[$type] containsDesc=[$containsDesc])")
+        LOGGER.debug("[GraphQL Resolver] getClockActions(user=[$user] type=[$type] containsDesc=[$containsDesc])")
         return usersToClockActionsDataLoader.load(user.id).thenApplyAsync {
             it.filter { action ->
                 //filter actions based on extra graphql

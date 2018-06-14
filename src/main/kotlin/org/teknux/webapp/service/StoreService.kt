@@ -3,6 +3,7 @@ package org.teknux.webapp.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
+import org.teknux.webapp.model.Office
 import org.teknux.webapp.model.User
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -17,12 +18,59 @@ class StoreService {
     }
 
     @Volatile
+    private var currentOfficeIndex: AtomicInteger = AtomicInteger(0)
+    @Volatile
     private var currentUsersIndex: AtomicInteger = AtomicInteger(0)
     @Volatile
     var currentActionsIndex: AtomicInteger = AtomicInteger(0)
 
+    private val officesMap: MutableMap<Int, Office> = ConcurrentHashMap()
     private val usersMap: MutableMap<Int, User> = ConcurrentHashMap()
     private val actionsMap: MutableMap<Int, MutableSet<ClockAction>> = ConcurrentHashMap()
+    private val actionIdToOfficeIdMap: MutableMap<Int, Int> = ConcurrentHashMap()
+
+    @Synchronized
+    fun newOffice(office: Office): Office {
+        LOGGER.debug("[StoreService] newOffice(user=[$office])")
+
+        officesMap.values.find { value -> value.name == office.name }?.let {
+            throw IllegalArgumentException("User Name [${office.name}] already exist!")
+        }
+
+        office.id = currentOfficeIndex.incrementAndGet();
+        office.id!!.let {
+            officesMap[it] = office
+        }
+        return office
+    }
+
+    @Synchronized
+    fun removeOffice(officeId: Int) {
+        LOGGER.debug("[StoreService] removeOffice(officeId=[$officeId])")
+
+        officesMap[officeId]?.let {
+            val actions = getActions().orEmpty().filter { it.officeId == officeId };
+            val userIds = actions.groupBy { it.userId }.keys
+            if (actions.isNotEmpty()) throw IllegalArgumentException("ClockActions refs exist for officeId=[$officeId] by userIds=[$userIds]") else officesMap.remove(officeId)
+        } ?: throw IllegalArgumentException("User Id does not exist!")
+    }
+
+    fun getOffice(officeId: Int): Office {
+        LOGGER.debug("[StoreService] getOffice(officeId=[$officeId])")
+
+        officesMap[officeId]?.let {
+            return it
+        } ?: throw IllegalArgumentException("Office Id does not exist!")
+    }
+
+    fun getOffices(clockIds: Set<Int>? = null): List<Office> {
+        LOGGER.debug("[StoreService] getOffices(officeId=[$clockIds])")
+        val results: MutableList<Office> = mutableListOf()
+        return clockIds?.let { it.forEach {
+            actionIdToOfficeIdMap[it]?.let { results.add(officesMap[it]!!) } }
+            results
+        } ?: officesMap.values.toList()
+    }
 
     @Synchronized
     fun newUser(user: User): User {
@@ -44,7 +92,9 @@ class StoreService {
         LOGGER.debug("[StoreService] removeUser(id=[$id])")
 
         usersMap[id]?.let {
-            actionsMap.remove(id)
+            actionsMap.remove(id)?.let {
+                it.forEach { actionIdToOfficeIdMap.remove(it.id) }
+            }
             usersMap.remove(id)
         } ?: throw IllegalArgumentException("User Id does not exist!")
     }
@@ -70,6 +120,7 @@ class StoreService {
             action.id = currentActionsIndex.incrementAndGet()
             action.timestamp = LocalDateTime.now()
             actionsMap[action.userId] = (actionsMap.getOrPut(action.userId) { mutableSetOf() } + action) as MutableSet
+            actionIdToOfficeIdMap[action.id!!] = action.officeId!!
             return action
         } else {
             throw IllegalArgumentException("User Id for this Action does not exist!")

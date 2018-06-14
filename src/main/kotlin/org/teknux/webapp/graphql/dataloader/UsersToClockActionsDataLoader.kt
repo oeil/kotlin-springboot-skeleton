@@ -9,4 +9,6 @@ import org.teknux.webapp.service.StoreService
  * GraphQL DataLoader to batch-fetch all [ClockAction] items for all given [User] ids - Spring component ready for dep injection support.
  */
 @Component
-class UsersToClockActionsDataLoader(storeService: StoreService, options: DataLoaderOptions? = null) : GenericValueListDataLoader<Int, ClockAction>(fetcher = { storeService.getActions(it).orEmpty() }, keySelector = { it.userId }, options = options)
+class UsersToClockActionsDataLoader(storeService: StoreService, options: DataLoaderOptions? = DataLoaderOptions.newOptions().setBatchingEnabled(true).setCachingEnabled(true)) : GenericValueListDataLoader<Int, ClockAction>(
+        fetcher = { storeService.getActions(it).orEmpty() }, keySelector = { it.userId }, options = options
+)
