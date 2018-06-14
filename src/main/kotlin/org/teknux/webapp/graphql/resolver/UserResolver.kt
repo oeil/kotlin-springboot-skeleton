@@ -1,14 +1,19 @@
-package org.teknux.webapp.graphsql.resolver
+package org.teknux.webapp.graphql.resolver
 
 import com.coxautodev.graphql.tools.GraphQLResolver
-import org.dataloader.DataLoaderOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import org.teknux.webapp.graphql.dataloader.UsersToClockActionsDataLoader
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
 import java.util.concurrent.CompletableFuture
 
+/**
+ * GraphQL resolves [User]'s sub-types (e.g. Array of [ClockAction]) when necessary
+ */
+@Component
 class UserResolver(private val storeService: StoreService): GraphQLResolver<User> {
 
     companion object {
@@ -16,7 +21,7 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
     }
 
     @Autowired
-    private lateinit var userToClockActionsDataLoader: UserToClockActionsDataLoader
+    private lateinit var usersToClockActionsDataLoader: UsersToClockActionsDataLoader
 
     /**
      * Fetcher making use of GraphQL DataLoader to avoid n+1 queries when asking [ClockAction] collection per [User]
@@ -25,7 +30,7 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
      */
     fun getClockActions(user: User, type: Int?, containsDesc: String?): CompletableFuture<List<ClockAction>> {
         LOGGER.info("[GraphQL Resolver] getClockActions(user=[$user] type=[$type] containsDesc=[$containsDesc])")
-        return userToClockActionsDataLoader.load(user.id).thenApplyAsync {
+        return usersToClockActionsDataLoader.load(user.id).thenApplyAsync {
             it.filter { action ->
                 //filter actions based on extra graphql
                 (type?.equals(action.type) ?: true) && (containsDesc?.let { action.desc.contains(it, true)} ?: true)
@@ -49,9 +54,4 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
         }
     }
     */
-
-    /**
-     * GraphQL DataLoader class specs to query ClockActions for user - useful for springboot to be used as a Bean (dep injection).
-     */
-    class UserToClockActionsDataLoader(fetcher: (Iterable<Int>) -> Iterable<ClockAction>, keySelector: (ClockAction) -> Int, options: DataLoaderOptions? = null) : GenericValueListDataLoader<Int, ClockAction>(fetcher, keySelector, options)
 }

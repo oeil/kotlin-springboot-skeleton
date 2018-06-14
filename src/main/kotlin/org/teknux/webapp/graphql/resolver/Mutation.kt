@@ -1,10 +1,12 @@
-package org.teknux.webapp.graphsql.resolver
+package org.teknux.webapp.graphql.resolver
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
+import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.StoreService
 
+@Component
 class Mutation(private val storeService: StoreService): GraphQLMutationResolver {
 
     fun user(name: String): User {

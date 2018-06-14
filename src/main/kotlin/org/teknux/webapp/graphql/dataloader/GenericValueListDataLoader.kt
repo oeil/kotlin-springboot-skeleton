@@ -1,4 +1,4 @@
-package org.teknux.webapp.graphsql.resolver
+package org.teknux.webapp.graphql.dataloader
 
 import org.dataloader.BatchLoader
 import org.dataloader.DataLoader
