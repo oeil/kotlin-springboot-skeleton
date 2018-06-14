@@ -1,13 +1,30 @@
+# Schema's root Query Types (fetch data)
 type Query {
+    # Get a list of Offices, support filter on Office's id
     offices(id: Int): [Office]!
+
+    # Get list of Users, supports filter on User's id
     users(id: Int): [User]!
+
+    # Get list of ClockAction, supports filter on User's id
     clockActions(userId: Int): [ClockAction]!
+
+    # Get the last ClockAction performed for given User id
     lastClockAction(userId: Int): ClockAction!
 }
+
+# Schema's root Mutation Types (create/update/delete data)
 type Mutation {
+    # add new User
     user(name: String!) : User!
+
+    # add new Office
     office(name: String!) : Office!
+
+    # Clock user id In
     clockIn(userId: Int!, desc:String, officeId:Int): ClockAction
+
+    # Clock user id Out
     clockOut(userId: Int!, desc:String, officeId:Int): ClockAction
 }
 
