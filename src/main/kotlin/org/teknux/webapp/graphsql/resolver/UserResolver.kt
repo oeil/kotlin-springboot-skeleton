@@ -19,18 +19,23 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
     private lateinit var userToClockActionsDataLoader: UserToClockActionsDataLoader
 
     /**
-     * Fetcher implementing GraphQL DataLoader
+     * Fetcher making use of GraphQL DataLoader to avoid n+1 queries when asking [ClockAction] collection per [User]
      *
      * @param storeService the service used to access data
      */
     fun getClockActions(user: User, type: Int?, containsDesc: String?): CompletableFuture<List<ClockAction>> {
-        LOGGER.info("[GraphQL Resolver] getClockActions(user=[${user}] type=[$type] containsDesc=[$containsDesc])")
-        return userToClockActionsDataLoader.load(user.id);
+        LOGGER.info("[GraphQL Resolver] getClockActions(user=[$user] type=[$type] containsDesc=[$containsDesc])")
+        return userToClockActionsDataLoader.load(user.id).thenApplyAsync {
+            it.filter { action ->
+                //filter actions based on extra graphql
+                (type?.equals(action.type) ?: true) && (containsDesc?.let { action.desc.contains(it, true)} ?: true)
+            }
+        };
     }
 
     /*
     /**
-     * Default fetcher without DataLoader (batching of queries and/or caching)
+     * Simple Fetcher without DataLoader (batching of queries and/or caching)
      */
     fun getClockActions(user: User, type: Int?, containsDesc: String?) : Iterable<ClockAction> {
         LOGGER.info("[GraphQL Resolver] getClockActions(user=[${user}] type=[$type] containsDesc=[$containsDesc])")
