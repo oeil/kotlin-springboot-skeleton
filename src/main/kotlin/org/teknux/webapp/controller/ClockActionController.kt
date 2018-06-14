@@ -15,21 +15,13 @@ class ClockActionController {
 
     @GetMapping
     fun getAll(@RequestParam userId: Int?): Set<ClockAction> {
-        userId?.let {
-            storeService.getUser(it)?.let {
-                return storeService.getActions(it).orEmpty()
-            }
-        }
-
-        return storeService.getActions().orEmpty()
+        return userId?.let {
+            storeService.getActions(it).orEmpty()
+        } ?: storeService.getActions().orEmpty()
     }
 
     @PostMapping
     fun addAction(@RequestBody action: ClockAction): ResponseEntity<ClockAction> {
-        action!!.let {
-            it.userId!!.let {
-                return ResponseEntity.ok(storeService.addAction(action))
-            }
-        }
+        return ResponseEntity.ok(storeService.addAction(action))
     }
 }

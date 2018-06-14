@@ -1,5 +1,6 @@
 package org.teknux.webapp.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
@@ -11,6 +12,10 @@ import java.util.stream.Collectors
 @Service
 class StoreService {
 
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(StoreService::class.java)
+    }
+
     @Volatile
     private var currentUsersIndex: AtomicInteger = AtomicInteger(0)
     @Volatile
@@ -21,6 +26,8 @@ class StoreService {
 
     @Synchronized
     fun newUser(user: User): User {
+        LOGGER.debug("[StoreService] newUser(user=[$user])")
+
         usersMap.values.find { value -> value.name == user.name }?.let {
             throw IllegalArgumentException("User Name [${user.name}] already exist!")
         }
@@ -34,6 +41,8 @@ class StoreService {
 
     @Synchronized
     fun removeUser(id: Int) {
+        LOGGER.debug("[StoreService] removeUser(id=[$id])")
+
         usersMap[id]?.let {
             actionsMap.remove(id)
             usersMap.remove(id)
@@ -41,17 +50,22 @@ class StoreService {
     }
 
     fun getUser(id: Int): User {
+        LOGGER.debug("[StoreService] getUser(id=[$id])")
+
         usersMap[id]?.let {
             return it
         } ?: throw IllegalArgumentException("Unknown User Id [${id}]!")
     }
 
     fun getUsers(): Iterable<User> {
+        LOGGER.debug("[StoreService] getUsers()")
         return usersMap.values
     }
 
     @Synchronized
     fun addAction(action: ClockAction): ClockAction {
+        LOGGER.debug("[StoreService] addAction(action=[$action])")
+
         if (action.userId in usersMap) {
             action.id = currentActionsIndex.incrementAndGet()
             action.timestamp = LocalDateTime.now()
@@ -62,16 +76,24 @@ class StoreService {
         }
     }
 
-    fun getActions(): Set<ClockAction>? {
+    private fun fetchAllActions(): Set<ClockAction>? {
+        LOGGER.debug("[StoreService] fetchAllActions()")
         return actionsMap.values.stream().flatMap(Set<ClockAction>::stream).collect(Collectors.toSet())
     }
 
-    fun getActions(user: User?): Set<ClockAction>? {
-        return user?.let { actionsMap[user.id] } ?: getActions()
+    fun getActions(userId: Int): Set<ClockAction>? {
+        LOGGER.debug("[StoreService] getActions(user=[$userId])")
+        return actionsMap[userId]
     }
 
-    fun getLastAction(user: User): ClockAction {
-        return getActions(user).orEmpty().sortedByDescending { it.timestamp }.first()
+    fun getActions(userIds: Iterable<Int>? = null): Set<ClockAction>? {
+        LOGGER.debug("[StoreService] getActions(userIds=[$userIds])")
+        return userIds?.let { fetchAllActions().orEmpty().filter { it.userId in userIds }.toSet() } ?: fetchAllActions()
+    }
+
+    fun getLastAction(userId: Int): ClockAction {
+        LOGGER.debug("[StoreService] getLastAction(user=[$userId])")
+        return getActions(userId).orEmpty().sortedByDescending { it.timestamp }.first()
     }
 
 }

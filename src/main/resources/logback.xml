@@ -5,7 +5,7 @@
     <property name="logback.pattern.full" value="[%d{yy-MM-dd HH:mm:ss.SSS}] [%-5p] (%-25c{0} %3L\\) %msg %ex{full}%n" />
     <property name="logback.path" value="${logback.path:-logs}" />
 
-    <property name="log.level" value="${log.level:-INFO}" />
+    <property name="log.level" value="${log.level:-DEBUG}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -33,7 +33,8 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework.boot" level="WARN"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="graphql" level="WARN"/>
 
     <root level="${logback.level.root}">
         <appender-ref ref="STDOUT" />
