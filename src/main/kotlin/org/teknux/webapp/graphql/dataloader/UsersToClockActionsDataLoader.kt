@@ -10,5 +10,5 @@ import org.teknux.webapp.service.StoreService
  */
 @Component
 class UsersToClockActionsDataLoader(storeService: StoreService, options: DataLoaderOptions? = DataLoaderOptions.newOptions().setBatchingEnabled(true).setCachingEnabled(true)) : GenericValueListDataLoader<Int, ClockAction>(
-        fetcher = { storeService.getActions(it).orEmpty() }, keySelector = { it.userId }, options = options
+        dataFetcher = { storeService.getActions(it).orEmpty() }, idSelector = { it.userId }, options = options
 )

@@ -15,9 +15,7 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import org.teknux.webapp.model.ClockAction
-import org.teknux.webapp.model.Office
-import org.teknux.webapp.model.User
+import org.teknux.webapp.model.DataGenerator
 import org.teknux.webapp.service.StoreService
 
 
@@ -44,20 +42,11 @@ class App() {
 
     @Bean
     fun init(storeService: StoreService) = CommandLineRunner {
-        LOGGER.info("### Init Data ..")
-        val office = storeService.newOffice(Office(name = "HQ"))
+        val genOfficeCount = (System.getProperty("genOffices") ?: "100").toInt()
+        val genUserCount = (System.getProperty("genUsers") ?: "100").toInt()
+        val genClockActionsPerUserCount = (System.getProperty("genInOutClockActionPairPerUser") ?: "10").toInt()
 
-        for (n in 1..10) {
-            var user = storeService.newUser(User(name = "user_$n"))
-            LOGGER.info("${user.name} created : ${user.id}")
-            user.id?.let {
-                storeService.addAction(ClockAction(type = 1, desc = "clockin", userId = it, officeId = office.id))
-                LOGGER.info("${user.name} clocked-in")
-                storeService.addAction(ClockAction(type = 0, desc = "clockout", userId = it, officeId = office.id))
-                LOGGER.info("${user.name} clocked-out")
-            }
-        }
-        LOGGER.info("### Done Init Data")
+        DataGenerator(storeService).generate(genOfficeCount, genUserCount, genClockActionsPerUserCount)
     }
 
     @Bean

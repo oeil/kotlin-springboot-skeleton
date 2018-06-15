@@ -49,7 +49,7 @@ class StoreService {
         LOGGER.debug("[StoreService] removeOffice(officeId=[$officeId])")
 
         officesMap[officeId]?.let {
-            val actions = getActions().orEmpty().filter { it.officeId == officeId };
+            val actions = getActions().orEmpty().filter { it.officeId == officeId }
             val userIds = actions.groupBy { it.userId }.keys
             if (actions.isNotEmpty()) throw IllegalArgumentException("ClockActions refs exist for officeId=[$officeId] by userIds=[$userIds]") else officesMap.remove(officeId)
         } ?: throw IllegalArgumentException("User Id does not exist!")
