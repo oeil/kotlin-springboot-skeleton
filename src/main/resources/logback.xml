@@ -37,6 +37,8 @@
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.apache.tomcat" level="WARN"/>
+    <logger name="org.apache.coyote" level="WARN"/>
+    <logger name="org.apache.catalina" level="WARN"/>
     <logger name="graphql" level="WARN"/>
 
     <root level="${logback.level.root}">
