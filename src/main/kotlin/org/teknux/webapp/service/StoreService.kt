@@ -31,7 +31,7 @@ class StoreService {
 
     @Synchronized
     fun newOffice(office: Office): Office {
-        LOGGER.debug("[StoreService] newOffice(user=[$office])")
+        LOGGER.trace("[StoreService] newOffice(user=[$office])")
 
         officesMap.values.find { value -> value.name == office.name }?.let {
             throw IllegalArgumentException("User Name [${office.name}] already exist!")
@@ -46,7 +46,7 @@ class StoreService {
 
     @Synchronized
     fun removeOffice(officeId: Int) {
-        LOGGER.debug("[StoreService] removeOffice(officeId=[$officeId])")
+        LOGGER.trace("[StoreService] removeOffice(officeId=[$officeId])")
 
         officesMap[officeId]?.let {
             val actions = getActions().orEmpty().filter { it.officeId == officeId }
@@ -56,7 +56,7 @@ class StoreService {
     }
 
     fun getOffice(officeId: Int): Office {
-        LOGGER.debug("[StoreService] getOffice(officeId=[$officeId])")
+        LOGGER.trace("[StoreService] getOffice(officeId=[$officeId])")
 
         officesMap[officeId]?.let {
             return it
@@ -64,7 +64,7 @@ class StoreService {
     }
 
     fun getOffices(clockIds: Set<Int>? = null): List<Office> {
-        LOGGER.debug("[StoreService] getOffices(officeId=[$clockIds])")
+        LOGGER.trace("[StoreService] getOffices(officeId=[$clockIds])")
         val results: MutableList<Office> = mutableListOf()
         return clockIds?.let { it.forEach {
             actionIdToOfficeIdMap[it]?.let { results.add(officesMap[it]!!) } }
@@ -74,7 +74,7 @@ class StoreService {
 
     @Synchronized
     fun newUser(user: User): User {
-        LOGGER.debug("[StoreService] newUser(user=[$user])")
+        LOGGER.trace("[StoreService] newUser(user=[$user])")
 
         usersMap.values.find { value -> value.name == user.name }?.let {
             throw IllegalArgumentException("User Name [${user.name}] already exist!")
@@ -89,7 +89,7 @@ class StoreService {
 
     @Synchronized
     fun removeUser(id: Int) {
-        LOGGER.debug("[StoreService] removeUser(id=[$id])")
+        LOGGER.trace("[StoreService] removeUser(id=[$id])")
 
         usersMap[id]?.let {
             actionsMap.remove(id)?.let {
@@ -100,7 +100,7 @@ class StoreService {
     }
 
     fun getUser(id: Int): User {
-        LOGGER.debug("[StoreService] getUser(id=[$id])")
+        LOGGER.trace("[StoreService] getUser(id=[$id])")
 
         usersMap[id]?.let {
             return it
@@ -108,13 +108,13 @@ class StoreService {
     }
 
     fun getUsers(): Iterable<User> {
-        LOGGER.debug("[StoreService] getUsers()")
+        LOGGER.trace("[StoreService] getUsers()")
         return usersMap.values
     }
 
     @Synchronized
     fun addAction(action: ClockAction): ClockAction {
-        LOGGER.debug("[StoreService] addAction(action=[$action])")
+        LOGGER.trace("[StoreService] addAction(action=[$action])")
 
         if (action.userId in usersMap) {
             action.id = currentActionsIndex.incrementAndGet()
@@ -128,22 +128,22 @@ class StoreService {
     }
 
     private fun fetchAllActions(): Set<ClockAction>? {
-        LOGGER.debug("[StoreService] fetchAllActions()")
+        LOGGER.trace("[StoreService] fetchAllActions()")
         return actionsMap.values.stream().flatMap(Set<ClockAction>::stream).collect(Collectors.toSet())
     }
 
     fun getActions(userId: Int): Set<ClockAction>? {
-        LOGGER.debug("[StoreService] getActions(user=[$userId])")
+        LOGGER.trace("[StoreService] getActions(user=[$userId])")
         return actionsMap[userId]
     }
 
     fun getActions(userIds: Iterable<Int>? = null): Set<ClockAction>? {
-        LOGGER.debug("[StoreService] getActions(userIds=[$userIds])")
+        LOGGER.trace("[StoreService] getActions(userIds=[$userIds])")
         return userIds?.let { fetchAllActions().orEmpty().filter { it.userId in userIds }.toSet() } ?: fetchAllActions()
     }
 
     fun getLastAction(userId: Int): ClockAction {
-        LOGGER.debug("[StoreService] getLastAction(user=[$userId])")
+        LOGGER.trace("[StoreService] getLastAction(user=[$userId])")
         return getActions(userId).orEmpty().sortedByDescending { it.timestamp }.first()
     }
 

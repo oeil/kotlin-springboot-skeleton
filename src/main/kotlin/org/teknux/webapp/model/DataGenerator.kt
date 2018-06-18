@@ -2,10 +2,10 @@ package org.teknux.webapp.model
 
 import org.slf4j.LoggerFactory
 import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.util.StopWatch
 import java.security.SecureRandom
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DataGenerator(private val storeService: StoreService) {
 
@@ -13,9 +13,9 @@ class DataGenerator(private val storeService: StoreService) {
         private val LOGGER = LoggerFactory.getLogger(DataGenerator::class.java)
     }
 
-    fun generate(offices: Int, users: Int, clockActionPairPerUser: Int): Duration {
+    fun generate(offices: Int, users: Int, clockActionPairPerUser: Int): Long {
         LOGGER.debug("### Generating Data ###")
-        var startTime = LocalDateTime.now()
+        val stopWatch = StopWatch().start()
 
         for (n in 1..offices) {
             var office = storeService.newOffice(Office(name = "Office_${UUID.randomUUID()}"))
@@ -37,8 +37,8 @@ class DataGenerator(private val storeService: StoreService) {
             }
         }
 
-        val duration = Duration.between(startTime, LocalDateTime.now())
-        LOGGER.debug("### Done Generated Data in ${duration.seconds}s - Offices=[$offices] Users=[$users] ClockActions=[${clockActionPairPerUser * 2 * users}]")
+        val duration = stopWatch.elapsed(TimeUnit.SECONDS)
+        LOGGER.debug("### Done Generated Data in ${duration}s - Offices=[$offices] Users=[$users] ClockActions=[${clockActionPairPerUser * 2 * users}]")
         return duration
     }
 }

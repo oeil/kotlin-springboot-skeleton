@@ -6,6 +6,7 @@
     <property name="logback.path" value="${logback.path:-logs}" />
 
     <property name="log.level" value="${log.level:-DEBUG}" />
+    <property name="logback.level.root" value="${log.level}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -34,6 +35,8 @@
     </appender>
 
     <logger name="org.springframework" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.apache.tomcat" level="WARN"/>
     <logger name="graphql" level="WARN"/>
 
     <root level="${logback.level.root}">

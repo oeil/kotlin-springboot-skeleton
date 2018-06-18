@@ -15,8 +15,8 @@
     </parent>
 
     <properties>
-        <kotlin.version>1.2.41</kotlin.version>
-        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
+        <kotlin.version>1.2.50</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <maven-shade.version>2.4.3</maven-shade.version>
 
         <janino.version>2.6.1</janino.version>
