@@ -37,7 +37,7 @@ type User {
 type ClockAction {
     id: ID!
     type: Int!
-    desc: String
+    description: String
     timestamp: String!
     office: Office!
 }

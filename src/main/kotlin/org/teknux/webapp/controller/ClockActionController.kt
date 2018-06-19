@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.teknux.webapp.model.ClockAction
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 
 @RestController
 @RequestMapping("/api/actions")
 class ClockActionController {
 
     @Autowired
-    private lateinit var storeService: StoreService
+    private lateinit var storeService: IStoreService
 
     @GetMapping
     fun getAll(@RequestParam userId: Int?): Set<ClockAction> {

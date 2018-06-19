@@ -1,6 +1,10 @@
 package org.teknux.webapp.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Condition
+import org.springframework.context.annotation.ConditionContext
+import org.springframework.context.annotation.Conditional
+import org.springframework.core.type.AnnotatedTypeMetadata
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
@@ -11,10 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 
 @Service
-class StoreService {
+@Conditional(InMemoryCustomStoreService.InMemoryCondition::class)
+class InMemoryCustomStoreService : IStoreService {
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(StoreService::class.java)
+        private val LOGGER = LoggerFactory.getLogger(InMemoryCustomStoreService::class.java)
     }
 
     @Volatile
@@ -27,11 +32,10 @@ class StoreService {
     private val officesMap: MutableMap<Int, Office> = ConcurrentHashMap()
     private val usersMap: MutableMap<Int, User> = ConcurrentHashMap()
     private val actionsMap: MutableMap<Int, MutableSet<ClockAction>> = ConcurrentHashMap()
-    private val actionIdToOfficeIdMap: MutableMap<Int, Int> = ConcurrentHashMap()
 
     @Synchronized
-    fun newOffice(office: Office): Office {
-        LOGGER.trace("[StoreService] newOffice(user=[$office])")
+    override fun newOffice(office: Office): Office {
+        LOGGER.trace("[InMemoryCustomStoreService] newOffice(user=[$office])")
 
         officesMap.values.find { value -> value.name == office.name }?.let {
             throw IllegalArgumentException("User Name [${office.name}] already exist!")
@@ -44,9 +48,10 @@ class StoreService {
         return office
     }
 
+    /*
     @Synchronized
     fun removeOffice(officeId: Int) {
-        LOGGER.trace("[StoreService] removeOffice(officeId=[$officeId])")
+        LOGGER.trace("[InMemoryCustomStoreService] removeOffice(officeId=[$officeId])")
 
         officesMap[officeId]?.let {
             val actions = getActions().orEmpty().filter { it.officeId == officeId }
@@ -54,27 +59,27 @@ class StoreService {
             if (actions.isNotEmpty()) throw IllegalArgumentException("ClockActions refs exist for officeId=[$officeId] by userIds=[$userIds]") else officesMap.remove(officeId)
         } ?: throw IllegalArgumentException("User Id does not exist!")
     }
+    */
 
-    fun getOffice(officeId: Int): Office {
-        LOGGER.trace("[StoreService] getOffice(officeId=[$officeId])")
+    override fun getOffice(officeId: Int): Office {
+        LOGGER.trace("[InMemoryCustomStoreService] getOffice(officeId=[$officeId])")
 
         officesMap[officeId]?.let {
             return it
         } ?: throw IllegalArgumentException("Office Id does not exist!")
     }
 
-    fun getOffices(clockIds: Set<Int>? = null): List<Office> {
-        LOGGER.trace("[StoreService] getOffices(officeId=[$clockIds])")
+    override fun getOffices(ids: Set<Int>?): List<Office> {
+        LOGGER.trace("[InMemoryCustomStoreService] getOffices(officeId=[$ids])")
         val results: MutableList<Office> = mutableListOf()
-        return clockIds?.let { it.forEach {
-            actionIdToOfficeIdMap[it]?.let { results.add(officesMap[it]!!) } }
-            results
+        return ids?.let {
+            officesMap.values.filter { it.id in ids }
         } ?: officesMap.values.toList()
     }
 
     @Synchronized
-    fun newUser(user: User): User {
-        LOGGER.trace("[StoreService] newUser(user=[$user])")
+    override fun newUser(user: User): User {
+        LOGGER.trace("[InMemoryCustomStoreService] newUser(user=[$user])")
 
         usersMap.values.find { value -> value.name == user.name }?.let {
             throw IllegalArgumentException("User Name [${user.name}] already exist!")
@@ -87,9 +92,10 @@ class StoreService {
         return user
     }
 
+    /*
     @Synchronized
     fun removeUser(id: Int) {
-        LOGGER.trace("[StoreService] removeUser(id=[$id])")
+        LOGGER.trace("[InMemoryCustomStoreService] removeUser(id=[$id])")
 
         usersMap[id]?.let {
             actionsMap.remove(id)?.let {
@@ -98,29 +104,36 @@ class StoreService {
             usersMap.remove(id)
         } ?: throw IllegalArgumentException("User Id does not exist!")
     }
+    */
 
-    fun getUser(id: Int): User {
-        LOGGER.trace("[StoreService] getUser(id=[$id])")
+    override fun getUser(id: Int): User {
+        LOGGER.trace("[InMemoryCustomStoreService] getUser(id=[$id])")
 
         usersMap[id]?.let {
             return it
         } ?: throw IllegalArgumentException("Unknown User Id [${id}]!")
     }
 
-    fun getUsers(): Iterable<User> {
-        LOGGER.trace("[StoreService] getUsers()")
+    override fun getUsers(): Iterable<User> {
+        LOGGER.trace("[InMemoryCustomStoreService] getUsers()")
         return usersMap.values
     }
 
     @Synchronized
-    fun addAction(action: ClockAction): ClockAction {
-        LOGGER.trace("[StoreService] addAction(action=[$action])")
+    override fun addAction(action: ClockAction): ClockAction {
+        LOGGER.trace("[InMemoryCustomStoreService] addAction(action=[$action])")
 
-        if (action.userId in usersMap) {
+        if (action.user.id in usersMap) {
+            action.user = usersMap[action.user.id]!!
+
+
+            action.office = officesMap[action.office.id]!!
             action.id = currentActionsIndex.incrementAndGet()
             action.timestamp = LocalDateTime.now()
-            actionsMap[action.userId] = (actionsMap.getOrPut(action.userId) { mutableSetOf() } + action) as MutableSet
-            actionIdToOfficeIdMap[action.id!!] = action.officeId!!
+
+            if (action.user.clockActions == null) action.user.clockActions = mutableListOf() else action.user.clockActions?.add(action)
+            actionsMap[action.user.id!!] = (actionsMap.getOrPut(action.user.id!!) { mutableSetOf() } + action) as MutableSet
+
             return action
         } else {
             throw IllegalArgumentException("User Id for this Action does not exist!")
@@ -128,23 +141,28 @@ class StoreService {
     }
 
     private fun fetchAllActions(): Set<ClockAction>? {
-        LOGGER.trace("[StoreService] fetchAllActions()")
+        LOGGER.trace("[InMemoryCustomStoreService] fetchAllActions()")
         return actionsMap.values.stream().flatMap(Set<ClockAction>::stream).collect(Collectors.toSet())
     }
 
-    fun getActions(userId: Int): Set<ClockAction>? {
-        LOGGER.trace("[StoreService] getActions(user=[$userId])")
+    override fun getActions(userId: Int): Set<ClockAction>? {
+        LOGGER.trace("[InMemoryCustomStoreService] getActions(user=[$userId])")
         return actionsMap[userId]
     }
 
-    fun getActions(userIds: Iterable<Int>? = null): Set<ClockAction>? {
-        LOGGER.trace("[StoreService] getActions(userIds=[$userIds])")
-        return userIds?.let { fetchAllActions().orEmpty().filter { it.userId in userIds }.toSet() } ?: fetchAllActions()
+    override fun getActions(userIds: Iterable<Int>?): Set<ClockAction>? {
+        LOGGER.trace("[InMemoryCustomStoreService] getActions(userIds=[$userIds])")
+        return userIds?.let { fetchAllActions().orEmpty().filter { it.user.id in userIds }.toSet() } ?: fetchAllActions()
     }
 
-    fun getLastAction(userId: Int): ClockAction {
-        LOGGER.trace("[StoreService] getLastAction(user=[$userId])")
+    override fun getLastAction(userId: Int): ClockAction {
+        LOGGER.trace("[InMemoryCustomStoreService] getLastAction(user=[$userId])")
         return getActions(userId).orEmpty().sortedByDescending { it.timestamp }.first()
     }
 
+    class InMemoryCondition : Condition {
+        override fun matches(context: ConditionContext?, metadata: AnnotatedTypeMetadata?): Boolean {
+            return (System.getProperty(IStoreService.STORE_PROPERTY) ?: IStoreService.DEFAULT_STORE).equals(IStoreService.IN_MEMORY_STORE)
+        }
+    }
 }

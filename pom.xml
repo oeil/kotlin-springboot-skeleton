@@ -16,7 +16,7 @@
 
     <properties>
         <kotlin.version>1.2.50</kotlin.version>
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <maven-shade.version>2.4.3</maven-shade.version>
 
         <janino.version>2.6.1</janino.version>
@@ -26,6 +26,8 @@
 
         <graphql-spring-boot-starter.version>4.2.0</graphql-spring-boot-starter.version>
         <graphql-java-tools.version>5.2.0</graphql-java-tools.version>
+
+        <h2.version>1.4.197</h2.version>
 
         <junit.version>4.11</junit.version>
     </properties>
@@ -68,6 +70,39 @@
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-tools</artifactId>
             <version>5.1.0</version>
+        </dependency>
+
+        <!-- ORM -->
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean</artifactId>
+            <version>11.17.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean-querybean</artifactId>
+            <version>11.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>querybean-generator</artifactId>
+            <!--
+            <artifactId>kotlin-querybean-generator</artifactId>
+            -->
+            <version>11.4.1</version>
+        </dependency>
+
+        <!-- H2 database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
         </dependency>
 
         <!-- Logs -->
@@ -166,6 +201,20 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- ebean -->
+            <plugin>
+                <groupId>io.repaint.maven</groupId>
+                <artifactId>tiles-maven-plugin</artifactId>
+                <version>2.10</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <tiles>
+                        <tile>io.ebean.tile:enhancement:5.6</tile>
+                        <tile>io.ebean.tile:kotlin-kapt:1.2</tile>
+                    </tiles>
+                </configuration>
             </plugin>
 
         </plugins>

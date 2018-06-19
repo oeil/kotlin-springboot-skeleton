@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
 import org.teknux.webapp.model.User
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 
 @Component
-class Mutation(private val storeService: StoreService): GraphQLMutationResolver {
+class Mutation(private val storeService: IStoreService): GraphQLMutationResolver {
 
     fun office(name: String): Office {
         return storeService.newOffice(Office(name = name))
@@ -19,10 +19,14 @@ class Mutation(private val storeService: StoreService): GraphQLMutationResolver 
     }
 
     fun clockIn(userId: Int, desc: String?, officeId: Int): ClockAction {
-        return storeService.addAction(ClockAction(userId = userId, type = 1, desc = desc ?: "in", officeId = officeId))
+        val user = storeService.getUser(userId);
+        val office = storeService.getOffice(officeId);
+        return storeService.addAction(ClockAction(user = user, type = 1, description = desc ?: "in", office = office))
     }
 
     fun clockOut(userId: Int, desc: String?, officeId: Int): ClockAction {
-        return storeService.addAction(ClockAction(userId = userId, type = 0, desc = desc ?: "out", officeId = officeId))
+        val user = storeService.getUser(userId);
+        val office = storeService.getOffice(officeId);
+        return storeService.addAction(ClockAction(user = user, type = 0, description = desc ?: "out", office = office))
     }
 }

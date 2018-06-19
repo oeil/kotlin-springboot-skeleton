@@ -41,6 +41,11 @@
     <logger name="org.apache.catalina" level="WARN"/>
     <logger name="graphql" level="WARN"/>
 
+    <logger name="io.ebean.SQL" level="TRACE"/>
+    <logger name="io.ebean.TXN" level="INFO"/>
+    <logger name="io.ebean.SUM" level="INFO"/>
+    <logger name="io.ebean.DDL" level="INFO"/>
+
     <root level="${logback.level.root}">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />

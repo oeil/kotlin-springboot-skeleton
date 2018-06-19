@@ -36,7 +36,7 @@ class StopWatch {
     }
 
     fun elapsed(unit: TimeUnit): Long {
-        if (start == 0L) stop()
+        stop()
         return unit.convert(elapsedNanoseconds, TimeUnit.NANOSECONDS)
     }
 }

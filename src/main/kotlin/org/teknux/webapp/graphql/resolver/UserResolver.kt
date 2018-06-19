@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component
 import org.teknux.webapp.graphql.dataloader.UsersToClockActionsDataLoader
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.User
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 import java.util.concurrent.CompletableFuture
 
 /**
  * GraphQL resolves [User]'s sub-types (e.g. Array of [ClockAction]) when necessary
  */
 @Component
-class UserResolver(private val storeService: StoreService): GraphQLResolver<User> {
+class UserResolver(private val storeService: IStoreService): GraphQLResolver<User> {
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(UserResolver::class.java)
@@ -33,7 +33,7 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
         return usersToClockActionsDataLoader.load(user.id).thenApplyAsync {
             it.filter { action ->
                 //filter actions based on extra graphql
-                (type?.equals(action.type) ?: true) && (containsDesc?.let { action.desc.contains(it, true)} ?: true)
+                (type?.equals(action.type) ?: true) && (containsDesc?.let { action.description.contains(it, true)} ?: true)
             }
         };
     }
@@ -49,7 +49,7 @@ class UserResolver(private val storeService: StoreService): GraphQLResolver<User
             storeService.getActions(user).orEmpty()
         } else {
             storeService.getActions(user).orEmpty().filter { action ->
-                (type?.equals(action.type) ?: true) && (containsDesc?.let { action.desc.contains(it, true)} ?: true)
+                (type?.equals(action.type) ?: true) && (containsDesc?.let { action.description.contains(it, true)} ?: true)
             }
         }
     }

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.teknux.webapp.model.User
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 
 
 @RestController
@@ -13,7 +13,7 @@ import org.teknux.webapp.service.StoreService
 class UserController {
 
     @Autowired
-    private lateinit var storeService: StoreService
+    private lateinit var storeService: IStoreService
 
     @GetMapping
     fun getAll(): Iterable<User> {
@@ -27,6 +27,7 @@ class UserController {
         } ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
+    /*
     @DeleteMapping("/{id}")
     fun deleteUser(@PathVariable id: Int): ResponseEntity<Unit> {
         storeService.getUser(id)?.let {
@@ -34,6 +35,7 @@ class UserController {
             return ResponseEntity(HttpStatus.OK)
         } ?: return ResponseEntity(HttpStatus.NOT_FOUND)
     }
+    */
 
     @PostMapping
     fun addUser(@RequestBody user: User): ResponseEntity<User> {

@@ -16,7 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.DataGenerator
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 
 
 @SpringBootApplication
@@ -41,7 +41,7 @@ class App() {
     }
 
     @Bean
-    fun init(storeService: StoreService) = CommandLineRunner {
+    fun init(storeService: IStoreService) = CommandLineRunner {
         val genOfficeCount = (System.getProperty("genOffices") ?: "100").toInt()
         val genUserCount = (System.getProperty("genUsers") ?: "100").toInt()
         val genClockActionsPerUserCount = (System.getProperty("genInOutClockActionPairPerUser") ?: "10").toInt()

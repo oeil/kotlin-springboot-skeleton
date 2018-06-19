@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
 import org.teknux.webapp.model.User
-import org.teknux.webapp.service.StoreService
+import org.teknux.webapp.service.IStoreService
 import org.teknux.webapp.util.StopWatch
 import java.util.concurrent.TimeUnit
 
 @Component
-class Query(private val storeService: StoreService) : GraphQLQueryResolver {
+class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(Query::class.java)
