@@ -73,7 +73,9 @@ class InMemoryCustomStoreService : IStoreService {
         LOGGER.trace("[InMemoryCustomStoreService] getOffices(officeId=[$ids])")
         val results: MutableList<Office> = mutableListOf()
         return ids?.let {
-            officesMap.values.filter { it.id in ids }
+            var result: MutableList<Office> = mutableListOf()
+            it.forEach { result.add(officesMap[it]!!) }
+            result
         } ?: officesMap.values.toList()
     }
 
