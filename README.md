@@ -13,6 +13,7 @@ Those branches provide skeletons for Spring Boot apps based on different flavors
 
 - [tomcat-graphql-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-graphql-rest-webserver) Tomcat (embedded) - GraphQL and REST Web Services
 - :fire: [tomcat-graphql-dataloader-rest-webserver](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-graphql-dataloader-rest-webserver) Tomcat (embedded) - GraphQL using Data Loader to avoid n+1 queries and REST Web Services
+- [tomcat-graphql-dataloader-h2-ebean](https://github.com/oeil/kotlin-springboot-skeleton/tree/tomcat-graphql-dataloader-h2-ebean) Tomcat (embedded) - GraphQL using Data Loader to avoid n+1 queries with H2 store by default, but support homemade in-memory store as well and REST Web Services
 
 
 ## Build Project
