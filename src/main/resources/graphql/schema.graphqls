@@ -1,13 +1,37 @@
+type User {
+    id: ID!
+    name: String!
+    clockActions(type: Int, containsDesc: String) : [ClockAction]
+}
+
+type ClockAction {
+    id: ID!
+    type: Int!
+    description: String
+    timestamp: String!
+    office: Office!
+}
+
+type Office {
+    id: ID!
+    name: String!
+}
+
+input Paging {
+    limit: Int!
+    offset: Int!
+}
+
 # Schema's root Query Types (fetch data)
 type Query {
     # Get a list of Offices, support filter on Office's id
-    offices(id: Int): [Office]!
+    offices(id: Int, paging: Paging): [Office]!
 
     # Get list of Users, supports filter on User's id
-    users(id: Int): [User]!
+    users(id: Int, paging: Paging): [User]!
 
     # Get list of ClockAction, supports filter on User's id
-    clockActions(userId: Int): [ClockAction]!
+    clockActions(userId: Int, paging: Paging): [ClockAction]!
 
     # Get the last ClockAction performed for given User id
     lastClockAction(userId: Int): ClockAction!
@@ -26,23 +50,4 @@ type Mutation {
 
     # Clock user id Out
     clockOut(userId: Int!, desc:String, officeId:Int): ClockAction
-}
-
-type User {
-    id: ID!
-    name: String!
-    clockActions(type: Int, containsDesc: String) : [ClockAction]
-}
-
-type ClockAction {
-    id: ID!
-    type: Int!
-    description: String
-    timestamp: String!
-    office: Office!
-}
-
-type Office {
-    id: ID!
-    name: String!
 }

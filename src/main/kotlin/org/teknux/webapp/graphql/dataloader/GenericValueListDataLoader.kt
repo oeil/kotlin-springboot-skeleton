@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture
  *
  * @author oeil
  */
-open class GenericValueListDataLoader<ID, VALUE>(dataFetcher: (Iterable<ID>) -> Iterable<VALUE>, idSelector: (VALUE) -> ID, options: DataLoaderOptions? = null) : DataLoader<ID, List<VALUE>>(
+open class GenericValueListDataLoader<ID, VALUE>(dataFetcher: (Collection<ID>) -> Collection<VALUE>, idSelector: (VALUE) -> ID, options: DataLoaderOptions? = null) : DataLoader<ID, List<VALUE>>(
         BatchLoader { keys -> CompletableFuture.supplyAsync {
             val results: MutableList<List<VALUE>> = mutableListOf()
             val idToResultsMap: Map<ID, List<VALUE>> = dataFetcher.invoke(keys).groupBy { idSelector.invoke(it) }.map { it.key to it.value }.toMap()

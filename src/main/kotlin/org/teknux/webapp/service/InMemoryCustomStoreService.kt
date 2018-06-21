@@ -8,6 +8,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
+import org.teknux.webapp.model.Paging
 import org.teknux.webapp.model.User
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -31,7 +32,19 @@ class InMemoryCustomStoreService : IStoreService {
 
     private val officesMap: MutableMap<Int, Office> = ConcurrentHashMap()
     private val usersMap: MutableMap<Int, User> = ConcurrentHashMap()
-    private val actionsMap: MutableMap<Int, MutableSet<ClockAction>> = ConcurrentHashMap()
+    private val actionsMap: MutableMap<Int, MutableList<ClockAction>> = ConcurrentHashMap()
+
+    fun <T> Paging.getPages(input: List<T>): List<T> {
+        val start = offset * limit
+        var end = (start) + limit
+
+        if (start >= input.size - 1) return listOf()
+        if (end > input.size - 1) end = input.size - 1
+
+        return input.subList(offset * limit, (offset * limit) + limit)
+    }
+
+    fun <T> List<T>.pagesOrAll(paging: Paging?) = paging?.getPages(this) ?: this
 
     @Synchronized
     override fun newOffice(office: Office): Office {
@@ -69,14 +82,13 @@ class InMemoryCustomStoreService : IStoreService {
         } ?: throw IllegalArgumentException("Office Id does not exist!")
     }
 
-    override fun getOffices(ids: Set<Int>?): List<Office> {
+    override fun getOffices(ids: Set<Int>?, paging: Paging?): List<Office> {
         LOGGER.trace("[InMemoryCustomStoreService] getOffices(officeId=[$ids])")
-        val results: MutableList<Office> = mutableListOf()
         return ids?.let {
             var result: MutableList<Office> = mutableListOf()
             it.forEach { result.add(officesMap[it]!!) }
-            result
-        } ?: officesMap.values.toList()
+            result.pagesOrAll(paging)
+        } ?: officesMap.values.toList().pagesOrAll(paging)
     }
 
     @Synchronized
@@ -116,9 +128,9 @@ class InMemoryCustomStoreService : IStoreService {
         } ?: throw IllegalArgumentException("Unknown User Id [${id}]!")
     }
 
-    override fun getUsers(): Iterable<User> {
+    override fun getUsers(paging: Paging?): List<User> {
         LOGGER.trace("[InMemoryCustomStoreService] getUsers()")
-        return usersMap.values
+        return usersMap.values.toList().pagesOrAll(paging)
     }
 
     @Synchronized
@@ -134,7 +146,7 @@ class InMemoryCustomStoreService : IStoreService {
             action.timestamp = LocalDateTime.now()
 
             if (action.user.clockActions == null) action.user.clockActions = mutableListOf() else action.user.clockActions?.add(action)
-            actionsMap[action.user.id!!] = (actionsMap.getOrPut(action.user.id!!) { mutableSetOf() } + action) as MutableSet
+            actionsMap[action.user.id!!] = (actionsMap.getOrPut(action.user.id!!) { mutableListOf() } + action) as MutableList<ClockAction>
 
             return action
         } else {
@@ -142,19 +154,20 @@ class InMemoryCustomStoreService : IStoreService {
         }
     }
 
-    private fun fetchAllActions(): Set<ClockAction>? {
+    private fun fetchAllActions(paging: Paging? = null): List<ClockAction> {
         LOGGER.trace("[InMemoryCustomStoreService] fetchAllActions()")
-        return actionsMap.values.stream().flatMap(Set<ClockAction>::stream).collect(Collectors.toSet())
+        return actionsMap.values.stream().flatMap(MutableList<ClockAction>::stream).collect(Collectors.toList()).pagesOrAll(paging)
     }
 
-    override fun getActions(userId: Int): Set<ClockAction>? {
+    override fun getActions(userId: Int, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[InMemoryCustomStoreService] getActions(user=[$userId])")
-        return actionsMap[userId]
+        return actionsMap[userId]?.pagesOrAll(paging) ?: listOf()
     }
 
-    override fun getActions(userIds: Iterable<Int>?): Set<ClockAction>? {
+    override fun getActions(userIds: Collection<Int>?, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[InMemoryCustomStoreService] getActions(userIds=[$userIds])")
-        return userIds?.let { fetchAllActions().orEmpty().filter { it.user.id in userIds }.toSet() } ?: fetchAllActions()
+        return userIds?.let { fetchAllActions().filter { it.user.id in userIds }.pagesOrAll(paging) }
+                ?: fetchAllActions(paging)
     }
 
     override fun getLastAction(userId: Int): ClockAction {
@@ -164,7 +177,8 @@ class InMemoryCustomStoreService : IStoreService {
 
     class InMemoryCondition : Condition {
         override fun matches(context: ConditionContext?, metadata: AnnotatedTypeMetadata?): Boolean {
-            return (System.getProperty(IStoreService.STORE_PROPERTY) ?: IStoreService.DEFAULT_STORE).equals(IStoreService.IN_MEMORY_STORE)
+            return (System.getProperty(IStoreService.STORE_PROPERTY)
+                    ?: IStoreService.DEFAULT_STORE).equals(IStoreService.IN_MEMORY_STORE)
         }
     }
 }

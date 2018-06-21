@@ -3,6 +3,7 @@ package org.teknux.webapp.service
 import io.ebean.Ebean
 import io.ebean.EbeanServerFactory
 import io.ebean.config.ServerConfig
+import io.ebean.typequery.TQRootBean
 import org.avaje.datasource.DataSourceConfig
 import org.springframework.context.annotation.Condition
 import org.springframework.context.annotation.ConditionContext
@@ -11,6 +12,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata
 import org.springframework.stereotype.Service
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
+import org.teknux.webapp.model.Paging
 import org.teknux.webapp.model.User
 import org.teknux.webapp.model.query.QClockAction
 import org.teknux.webapp.model.query.QOffice
@@ -23,6 +25,10 @@ import javax.annotation.PostConstruct
 @Conditional(H2StoreService.H2Condition::class)
 class H2StoreService : IStoreService {
 
+    fun <ENTITY, QUERY_BEAN> TQRootBean<ENTITY, QUERY_BEAN>.findPagesOrAll(paging: Paging? = null): List<ENTITY> {
+        return paging?.let { this.query().setFirstRow(it.offset * it.limit).setMaxRows(it.limit).findList() } ?: this.query().findList()
+    }
+
     override fun newOffice(office: Office): Office {
         Ebean.save(office)
         return office
@@ -32,8 +38,10 @@ class H2StoreService : IStoreService {
         return QOffice().id.eq(officeId).select().findOne() ?: throw IllegalArgumentException("Office Id does not exist!")
     }
 
-    override fun getOffices(clockIds: Set<Int>?): List<Office> {
-        return clockIds?.let { QOffice().id.isIn(clockIds).findList() } ?: QOffice().findList()
+    override fun getOffices(clockIds: Set<Int>?, paging: Paging?): List<Office> {
+        val query = QOffice()
+        clockIds?.let { query.id.isIn(clockIds) }
+        return query.findPagesOrAll(paging)
     }
 
     override fun newUser(user: User): User {
@@ -45,8 +53,8 @@ class H2StoreService : IStoreService {
         return QUser().id.eq(id).findOne() ?: throw IllegalArgumentException("User Id does not exist!")
     }
 
-    override fun getUsers(): Iterable<User> {
-        return QUser().findList()
+    override fun getUsers(paging: Paging?): List<User> {
+        return QUser().findPagesOrAll(paging)
     }
 
     override fun addAction(action: ClockAction): ClockAction {
@@ -57,12 +65,12 @@ class H2StoreService : IStoreService {
         return action
     }
 
-    override fun getActions(userId: Int): Set<ClockAction>? {
-        return QClockAction().user.id.eq(userId).findList().toSet()
+    override fun getActions(userId: Int, paging: Paging?): List<ClockAction> {
+        return QClockAction().user.id.eq(userId).findPagesOrAll(paging)
     }
 
-    override fun getActions(userIds: Iterable<Int>?): Set<ClockAction>? {
-        return QClockAction().user.id.isIn(userIds!! as Collection<Int>).findList().toSet()
+    override fun getActions(userIds: Collection<Int>?, paging: Paging?): List<ClockAction> {
+        return QClockAction().user.id.isIn(userIds).findPagesOrAll(paging)
     }
 
     override fun getLastAction(userId: Int): ClockAction {

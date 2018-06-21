@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
+import org.teknux.webapp.model.Paging
 import org.teknux.webapp.model.User
 import org.teknux.webapp.service.IStoreService
 import org.teknux.webapp.util.StopWatch
@@ -17,30 +18,30 @@ class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
         private val LOGGER = LoggerFactory.getLogger(Query::class.java)
     }
 
-    fun offices(id: Int?): Iterable<Office> {
+    fun offices(id: Int?, paging: Paging?): Iterable<Office> {
         val stopWatch = StopWatch().start()
-        val result = storeService.getOffices(id?.let { setOf(id) })
+        val result = storeService.getOffices(id?.let { setOf(id) }, paging)
         LOGGER.debug("[GraphQL QUERY] offices(id=$id) - (processed in ${stopWatch.elapsed(TimeUnit.SECONDS)}s)")
         return result
     }
 
-    fun users(id: Int?): Iterable<User> {
+    fun users(id: Int?, paging: Paging?): Iterable<User> {
         val stopWatch = StopWatch().start()
 
         val result = id?.let {
             setOf(storeService.getUser(id))
-        } ?: storeService.getUsers()
+        } ?: storeService.getUsers(paging)
 
         LOGGER.debug("[GraphQL QUERY] users(id=$id) - (processed in ${stopWatch.elapsed(TimeUnit.SECONDS)}s)")
         return result
     }
 
-    fun clockActions(userId: Int?): Iterable<ClockAction> {
+    fun clockActions(userId: Int?, paging: Paging?): Iterable<ClockAction> {
         val stopWatch = StopWatch().start()
 
         val result = userId?.let {
-            storeService.getActions(it).orEmpty()
-        } ?: storeService.getActions().orEmpty()
+            storeService.getActions(it, paging)
+        } ?: storeService.getActions(paging = paging)
 
         LOGGER.debug("[GraphQL QUERY] clockActions(userId=$userId) - (processed in ${stopWatch.elapsed(TimeUnit.SECONDS)}s)")
         return result

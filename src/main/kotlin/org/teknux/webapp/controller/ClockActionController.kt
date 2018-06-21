@@ -14,10 +14,10 @@ class ClockActionController {
     private lateinit var storeService: IStoreService
 
     @GetMapping
-    fun getAll(@RequestParam userId: Int?): Set<ClockAction> {
+    fun getAll(@RequestParam userId: Int?): List<ClockAction> {
         return userId?.let {
-            storeService.getActions(it).orEmpty()
-        } ?: storeService.getActions().orEmpty()
+            storeService.getActions(it)
+        } ?: storeService.getActions()
     }
 
     @PostMapping

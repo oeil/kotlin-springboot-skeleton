@@ -1,5 +1,7 @@
 package org.teknux.webapp
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.execution.instrumentation.Instrumentation
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
 import org.dataloader.DataLoader
@@ -17,6 +19,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.DataGenerator
 import org.teknux.webapp.service.IStoreService
+import org.springframework.web.context.WebApplicationContext
+import javax.servlet.ServletException
+import org.springframework.boot.web.servlet.ServletContextInitializer
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.web.context.annotation.RequestScope
+import org.teknux.webapp.graphql.dataloader.UsersToClockActionsDataLoader
 
 
 @SpringBootApplication
@@ -44,8 +52,7 @@ class App() {
     fun init(storeService: IStoreService) = CommandLineRunner {
         val genOfficeCount = (System.getProperty("genOffices") ?: "100").toInt()
         val genUserCount = (System.getProperty("genUsers") ?: "100").toInt()
-        val genClockActionsPerUserCount = (System.getProperty("genInOutClockActionPairPerUser") ?: "10").toInt()
-
+        val genClockActionsPerUserCount = (System.getProperty("genActions") ?: "10").toInt()
         DataGenerator(storeService).generate(genOfficeCount, genUserCount, genClockActionsPerUserCount)
     }
 
