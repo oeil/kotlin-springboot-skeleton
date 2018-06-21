@@ -11,7 +11,7 @@ interface IStoreService {
 
     fun getOffice(officeId: Int): Office
 
-    fun getOffices(clockIds: Set<Int>? = null, paging: Paging? = null): List<Office>
+    fun getOffices(ids: Set<Int>? = null, paging: Paging? = null): List<Office>
 
     fun newUser(user: User): User
 
@@ -31,6 +31,7 @@ interface IStoreService {
         val STORE_PROPERTY: String = "store"
         val IN_MEMORY_STORE: String = "memory"
         val H2_STORE: String = "h2"
+        val HAZELCAST_STORE: String = "hazelcast"
         val DEFAULT_STORE: String = H2_STORE
     }
 }

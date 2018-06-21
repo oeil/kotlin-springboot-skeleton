@@ -105,6 +105,13 @@
             <version>${h2.version}</version>
         </dependency>
 
+        <!-- Hazelcast -->
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>3.10.2</version>
+        </dependency>
+
         <!-- Logs -->
         <!-- For condition in logback.xml -->
         <dependency>

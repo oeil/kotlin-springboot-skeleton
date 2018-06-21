@@ -17,23 +17,24 @@ class DataGenerator(private val storeService: IStoreService) {
         LOGGER.debug("### Generating Data ###")
         val stopWatch = StopWatch().start()
 
-        val officesSet: MutableList<Office> = mutableListOf()
+        var officesSet: MutableList<Office> = mutableListOf()
         for (n in 1..offices) {
             var office = storeService.newOffice(Office(name = "Office_${UUID.randomUUID()}"))
             officesSet.add(office)
-            LOGGER.trace("Office ${office.name} created : ${office.id}")
+            LOGGER.debug("Office ${office.name} created : ${office.id}")
         }
+        officesSet = storeService.getOffices() as MutableList<Office>
 
         for (n in 1..users) {
             var user = storeService.newUser(User(name = "user_${UUID.randomUUID()}"))
-            LOGGER.trace("User ${user.name} created : ${user.id}")
+            LOGGER.debug("User ${user.name} created : ${user.id}")
             user.id?.let {
                 for (clockActionN in 1..clockActionPairPerUser) {
-                    val randomOfficeIndex: Int = SecureRandom().nextInt(offices - 1)
+                    val randomOfficeIndex: Int = SecureRandom().nextInt(officesSet.size - 1)
                     storeService.addAction(ClockAction(type = 1, description = "clock in (${UUID.randomUUID()})", user = user, office = officesSet.get(randomOfficeIndex)))
-                    LOGGER.trace("${user.name} clocked-in")
+                    LOGGER.debug("${user.name} clocked-in")
                     storeService.addAction(ClockAction(type = 0, description = "clock out (${UUID.randomUUID()})", user = user, office = officesSet.get(randomOfficeIndex)))
-                    LOGGER.trace("${user.name} clocked-out")
+                    LOGGER.debug("${user.name} clocked-out")
                 }
             }
         }
