@@ -1,4 +1,4 @@
-# Standalone App(web enabled) demonstrating Springboot, Kotlin, GraphQL and Hazelcast tech stack all together
+# Standalone App(web) demonstrating Springboot, Kotlin, GraphQL and Hazelcast tech stack all together
 
 This branch uses Tomcat embedded as web-server (via springboot), GraphQL web services (in addition to REST) and :fire: **Hazelcast** :fire: as datastore (clustering support out-of-the box).
 
@@ -9,6 +9,8 @@ You can spin-off multiple instances of this app to get data replaction of the st
 mvn clean package
 ```
 ## Get Started
+Get a built pre-release [here](https://github.com/oeil/kotlin-springboot-skeleton/releases/tag/untagged-73d8dc92ea7fb5c576c7)
+
 ###### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
 ```
 java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
