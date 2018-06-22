@@ -2,6 +2,8 @@
 
 This branch uses Tomcat as web-server and exposes REST and GraphQL web services.
 
+:fire: support Hazelcast for datastore (clustering out-of-the box)
+
 ## Build Project
 ```
 mvn clean package
@@ -9,7 +11,12 @@ mvn clean package
 
 ## Run Application
 ```
-java -jar target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+```
+
+## Run Application & generate initial data (100 offices, 100 users, 10 clock in/out actions per user
+```
+java -jar -Dport=8080 -Dstore=hazelcast -DgenData=offices:100|users:100|actions:10 target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
 ```
 
 ## GraphQL Playground on current schema (powered by GraphiQL)
@@ -19,7 +26,7 @@ http://localhost:8080/graphiql
 ![Image of Graphiql](./graphiql-sample01.png)
 
 
-# GraphQL samples on provided Schema
+# GraphQL usage examples on provided Schema
 ### Query Users and ask for Id and Name for each:
 ```
 {
@@ -29,6 +36,17 @@ http://localhost:8080/graphiql
   }
 }
 ```
+
+### Query Users and ask for Id and Name for each, with Paging (first page of 5 rows):
+```
+{
+  users(paging:{offset:0, limit:5}) {
+    id
+    name
+  }
+}
+```
+
 ### Query Users with associated ClockActions (including associated Office name per ClockAction):
 ```
 users {
@@ -45,6 +63,7 @@ users {
     }
   }
 ```
+
 ### Query User for Id=1 with associated ClockActions (including associated Office name per ClockAction):
 ```
 users(id: 1) {
@@ -60,6 +79,13 @@ users(id: 1) {
       }
     }
   }
+```
+
+### Generate Data : 10 offices, 10 users, 10 clock in&out actions per user
+```
+mutation {
+  genData(offices: 10, users: 10, clockActions: 10)
+}
 ```
 
 ### Add new user name="oeil" and return its generated id
