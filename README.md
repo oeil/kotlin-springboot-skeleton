@@ -1,6 +1,6 @@
 # Standalone App(web enabled) demonstrating Springboot, Kotlin, GraphQL and Hazelcast tech stack all together
 
-This branch uses Tomcat embedded as web-server (via springboot) and GraphQL web services (in addition to REST) :fire: Hazelcast :fire: as datastore (clustering support out-of-the box).
+This branch uses Tomcat embedded as web-server (via springboot), GraphQL web services (in addition to REST) and :fire: **Hazelcast** :fire: as datastore (clustering support out-of-the box).
 
 You can spin-off multiple instances of this app to replicate seamlessly datastore. Each instance is automatically 'active', which means you can query (GraphQL or REST) on either one - it just works.
 
@@ -9,21 +9,21 @@ You can spin-off multiple instances of this app to replicate seamlessly datastor
 mvn clean package
 ```
 ## Get Started
-### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
+###### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
 ```
 java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
 ```
 
-### Run second Application Instance (on port 9090) & generate initial data (100 offices, 100 users, 10 clock in/out actions per user. Data get sync automatically across all other running instances (local or remote on same network)
+###### Run second Application Instance (on port 9090) & generate initial data (100 offices, 100 users, 10 clock in/out actions per user. Data get sync automatically across all other running instances (local or remote on same network)
 ```
 java -jar -Dport=9090 -Dstore=hazelcast -DgenData="offices:100|users:100|actions:10" target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
 ```
 
-### GraphQL Playground on current schema (powered by GraphiQL)
+###### GraphQL Playground on current schema (powered by GraphiQL)
 ```
 http://localhost:8080/graphiql
 ```
-### Make use of the "Docs" link on top right corner. The playground support intellisense/auto-completion against GraphQl schema
+###### Make use of the "Docs" link on top right corner. The playground support intellisense/auto-completion against GraphQl schema
 ![Image of Graphiql](./graphiql-sample01.png)
 
 
