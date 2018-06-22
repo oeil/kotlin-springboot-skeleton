@@ -2,7 +2,7 @@
 
 This branch uses Tomcat as web-server and exposes REST and GraphQL web services.
 
-:fire: support Hazelcast for datastore (clustering out-of-the box)
+:fire: Hazelcast :fire: as datastore (clustering support out-of-the box)
 
 ## Build Project
 ```
