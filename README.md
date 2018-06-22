@@ -16,7 +16,7 @@ java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-
 
 ## Run Application & generate initial data (100 offices, 100 users, 10 clock in/out actions per user
 ```
-java -jar -Dport=8080 -Dstore=hazelcast -DgenData=offices:100|users:100|actions:10 target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+java -jar -Dport=8080 -Dstore=hazelcast -DgenData="offices:100|users:100|actions:10" target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
 ```
 
 ## GraphQL Playground on current schema (powered by GraphiQL)
