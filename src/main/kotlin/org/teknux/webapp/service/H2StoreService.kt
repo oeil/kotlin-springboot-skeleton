@@ -77,6 +77,12 @@ class H2StoreService : IStoreService {
         return QClockAction().where().user.id.eq(userId).orderBy().timestamp.desc().setMaxRows(1).findOne() ?: throw IllegalArgumentException("No Clock Action for user")
     }
 
+    override fun countOffices(): Int = QOffice().findCount()
+
+    override fun countUsers(): Int = QUser().findCount()
+
+    override fun countClockActions(): Int = QClockAction().findCount()
+
     @PostConstruct
     fun init() {
         //read ebean config & create server & migrate database when necessary

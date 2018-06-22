@@ -2,6 +2,8 @@ package org.teknux.webapp.service
 
 import com.hazelcast.core.Hazelcast
 import com.hazelcast.core.HazelcastInstance
+import com.hazelcast.core.MultiMap
+import com.hazelcast.core.TransactionalMultiMap
 import com.hazelcast.transaction.TransactionOptions
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Condition
@@ -14,7 +16,6 @@ import org.teknux.webapp.model.Office
 import org.teknux.webapp.model.Paging
 import org.teknux.webapp.model.User
 import java.time.LocalDateTime
-import java.util.stream.Collectors
 import javax.annotation.PostConstruct
 
 
@@ -64,9 +65,11 @@ class HazelcastStoreService : IStoreService {
         LOGGER.trace("[${this.javaClass.simpleName}] newOffice([$office])")
         val officesMap = hazelcastInstance.getMap<Int, Office>(OFFICE_MAP_NAME)
 
+        /*
         officesMap.values.find { value -> value.name == office.name }?.let {
             throw IllegalArgumentException("User Name [${office.name}] already exist!")
         }
+        */
 
         office.id = hazelcastInstance.getAtomicLong(OFFICE_ATOMIC_ID_NAME).incrementAndGet().toInt()
         office.id!!.let {
@@ -99,9 +102,11 @@ class HazelcastStoreService : IStoreService {
         LOGGER.trace("[${this.javaClass.simpleName}] newUser(user=[$user])")
 
         val usersMap = hazelcastInstance.getMap<Int, User>(USER_MAP_NAME)
+        /*
         usersMap.values.find { value -> value.name == user.name }?.let {
             throw IllegalArgumentException("User Name [${user.name}] already exist!")
         }
+        */
 
         user.id = hazelcastInstance.getAtomicLong(USER_ATOMIC_ID_NAME).incrementAndGet().toInt()
         user.id!!.let {
@@ -133,7 +138,7 @@ class HazelcastStoreService : IStoreService {
 
         val usersMap = context.getMap<Int, User>(USER_MAP_NAME)
         val officesMap = context.getMap<Int, Office>(OFFICE_MAP_NAME)
-        val actionsMap = context.getMap<Int, MutableList<ClockAction>>(ACTION_MAP_NAME)
+        val actionsMMap: TransactionalMultiMap<Int, ClockAction> = context.getMultiMap<Int, ClockAction>(ACTION_MAP_NAME)
 
         if (action.user.id in usersMap.keySet()) {
             action.user = usersMap[action.user.id]
@@ -141,13 +146,10 @@ class HazelcastStoreService : IStoreService {
             action.office = officesMap[action.office.id]!!
             action.id = hazelcastInstance.getAtomicLong(ACTION_ATOMIC_ID_NAME).incrementAndGet().toInt()
             action.timestamp = LocalDateTime.now()
-
             if (action.user.clockActions == null) action.user.clockActions = mutableListOf() else action.user.clockActions?.add(action)
-            actionsMap[action.user.id!!] = if (actionsMap.containsKey(action.user.id)) {
-                (actionsMap.get(action.user.id!!) + action) as MutableList<ClockAction>
-            } else {
-                mutableListOf(action)
-            }
+
+            usersMap[action.user.id] = action.user
+            actionsMMap.put(action.user.id, action)
 
             context.commitTransaction()
             return action
@@ -159,26 +161,33 @@ class HazelcastStoreService : IStoreService {
 
     private fun fetchAllActions(paging: Paging? = null): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] fetchAllActions()")
-        val actionsMap = hazelcastInstance.getMap<Int, MutableList<ClockAction>>(ACTION_MAP_NAME)
-        return actionsMap.values.stream().flatMap(MutableList<ClockAction>::stream).collect(Collectors.toList()).sortedBy { it.id }.pagesOrAll(paging)
+        val actionsMMap = hazelcastInstance.getMultiMap<Int, ClockAction>(ACTION_MAP_NAME)
+        return actionsMMap.values().sortedBy { it.id }.pagesOrAll(paging)
     }
 
     override fun getActions(userId: Int, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] getActions(user=[$userId])")
-        val actionsMap = hazelcastInstance.getMap<Int, MutableList<ClockAction>>(ACTION_MAP_NAME)
-        return actionsMap[userId]?.sortedBy { it.id }?.pagesOrAll(paging) ?: listOf()
+        val actionsMMap = hazelcastInstance.getMultiMap<Int, ClockAction>(ACTION_MAP_NAME)
+        return actionsMMap[userId]?.sortedBy { it.id }?.pagesOrAll(paging) ?: listOf()
     }
 
     override fun getActions(userIds: Collection<Int>?, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] getActions(userIds=[$userIds])")
-        return userIds?.let { fetchAllActions().filter { it.user.id in userIds }.sortedBy { it.id }.pagesOrAll(paging) }
-                ?: fetchAllActions(paging)
+        return userIds?.let {
+            fetchAllActions().filter { it.user.id in userIds }.pagesOrAll(paging)
+        } ?: fetchAllActions(paging)
     }
 
     override fun getLastAction(userId: Int): ClockAction {
         LOGGER.trace("[${this.javaClass.simpleName}] getLastAction(user=[$userId])")
         return getActions(userId).orEmpty().sortedByDescending { it.timestamp }.first()
     }
+
+    override fun countOffices(): Int = hazelcastInstance.getMap<Int, Office>(OFFICE_MAP_NAME).count()
+
+    override fun countUsers(): Int = hazelcastInstance.getMap<Int, Office>(USER_MAP_NAME).count()
+
+    override fun countClockActions(): Int = hazelcastInstance.getMap<Int, Office>(ACTION_MAP_NAME).count()
 
     class HazelcastCondition : Condition {
         override fun matches(context: ConditionContext?, metadata: AnnotatedTypeMetadata?): Boolean {

@@ -54,4 +54,10 @@ class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
         LOGGER.debug("[GraphQL QUERY] lastClockAction(userId=$userId) - (processed in ${stopWatch.elapsed(TimeUnit.SECONDS)}s)")
         return result
     }
+
+    fun countOffices(): Int = storeService.countOffices()
+
+    fun countUsers(): Int = storeService.countUsers()
+
+    fun countClockActions(): Int = storeService.countClockActions()
 }

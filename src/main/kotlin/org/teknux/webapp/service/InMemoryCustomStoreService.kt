@@ -175,6 +175,12 @@ class InMemoryCustomStoreService : IStoreService {
         return getActions(userId).orEmpty().sortedByDescending { it.timestamp }.first()
     }
 
+    override fun countOffices(): Int = officesMap.count()
+
+    override fun countUsers(): Int = usersMap.count()
+
+    override fun countClockActions(): Int = actionsMap.count()
+
     class InMemoryCondition : Condition {
         override fun matches(context: ConditionContext?, metadata: AnnotatedTypeMetadata?): Boolean {
             return (System.getProperty(IStoreService.STORE_PROPERTY)

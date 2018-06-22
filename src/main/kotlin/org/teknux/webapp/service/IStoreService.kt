@@ -27,6 +27,12 @@ interface IStoreService {
 
     fun getLastAction(userId: Int): ClockAction
 
+    fun countOffices(): Int
+
+    fun countUsers(): Int
+
+    fun countClockActions(): Int
+
     companion object {
         val STORE_PROPERTY: String = "store"
         val IN_MEMORY_STORE: String = "memory"
