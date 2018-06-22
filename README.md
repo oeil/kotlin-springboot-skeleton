@@ -9,7 +9,7 @@ You can spin-off multiple instances of this app to get data replaction of the st
 mvn clean package
 ```
 ## Get Started
-Get a built pre-release [here](https://github.com/oeil/kotlin-springboot-skeleton/releases/tag/untagged-73d8dc92ea7fb5c576c7)
+Get a built pre-release [here](https://github.com/oeil/kotlin-springboot-skeleton/releases/tag/untagged-7b3d510a25eaa7bfbe71)
 
 ###### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
 ```
