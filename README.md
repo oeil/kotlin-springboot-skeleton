@@ -2,7 +2,7 @@
 
 This branch uses Tomcat embedded as web-server (via springboot), GraphQL web services (in addition to REST) and :fire: **Hazelcast** :fire: as datastore (clustering support out-of-the box).
 
-You can spin-off multiple instances of this app to replicate seamlessly datastore. Each instance is automatically 'active', which means you can query (GraphQL or REST) on either one - it just works.
+You can spin-off multiple instances of this app to get data replaction of the store seamlessly. Each instance is automatically 'active', which means you can query (via GraphQL or REST) on either one - it just works.
 
 ## Build Project
 ```
