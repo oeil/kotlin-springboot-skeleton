@@ -13,12 +13,12 @@ Get a built pre-release [here](https://github.com/oeil/kotlin-springboot-skeleto
 
 ###### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
 ```
-java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.1-SNAPSHOT.jar
 ```
 
 ###### Run second Application Instance (on port 9090) & generate initial data (100 offices, 100 users, 10 clock in/out actions per user. Data get sync automatically across all other running instances (local or remote on same network)
 ```
-java -jar -Dport=9090 -Dstore=hazelcast -DgenData="offices:100|users:100|actions:10" target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+java -jar -Dport=9090 -Dstore=hazelcast -DgenData="offices:100|users:100|actions:10" target/kotlin-springboot-skeleton-1.0.1-SNAPSHOT.jar
 ```
 
 ###### GraphQL Playground on current schema (powered by GraphiQL)
