@@ -1,7 +1,5 @@
 package org.teknux.webapp
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.execution.instrumentation.Instrumentation
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
 import org.dataloader.DataLoader
@@ -18,13 +16,8 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.teknux.webapp.model.DataGenerator
+import org.teknux.webapp.model.GenData
 import org.teknux.webapp.service.IStoreService
-import org.springframework.web.context.WebApplicationContext
-import javax.servlet.ServletException
-import org.springframework.boot.web.servlet.ServletContextInitializer
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
-import org.springframework.web.context.annotation.RequestScope
-import org.teknux.webapp.graphql.dataloader.UsersToClockActionsDataLoader
 
 
 @SpringBootApplication
@@ -44,16 +37,31 @@ class App() {
     @Component
     class CustomizationBean : WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
         override fun customize(container: ConfigurableServletWebServerFactory) {
-            container.setPort((System.getProperty("port") ?: "8080").toInt())
+            container.setPort((System.getProperty("port") ?: "8282").toInt())
         }
     }
 
+    /**
+     * Generate initial random  data set when requested via the startup VM option. Provide following command option to start the app:
+     * <P>
+     *     -DgenData=offices:COUNT|users:COUNT|actions:COUNT
+     * </P>
+     */
     @Bean
-    fun init(storeService: IStoreService) = CommandLineRunner {
-        val genOfficeCount = (System.getProperty("genOffices") ?: "100").toInt()
-        val genUserCount = (System.getProperty("genUsers") ?: "100").toInt()
-        val genClockActionsPerUserCount = (System.getProperty("genActions") ?: "10").toInt()
-        DataGenerator(storeService).generate(genOfficeCount, genUserCount, genClockActionsPerUserCount)
+    fun genInitialData(storeService: IStoreService) = CommandLineRunner {
+        System.getProperty("genData")?.let {
+            val genData = GenData()
+            it.split("|").stream().forEach {
+                val key = it.split(":")[0]
+                val value = it.split(":")[1].toInt()
+                when(key) {
+                    "offices" -> genData.offices = value
+                    "users" -> genData.users = value
+                    "actions" -> genData.actions = value
+                }
+            }
+            DataGenerator(storeService).generate(genData.offices, genData.users, genData.actions)
+        }
     }
 
     @Bean

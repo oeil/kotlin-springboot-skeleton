@@ -50,4 +50,7 @@ type Mutation {
 
     # Clock user id Out
     clockOut(userId: Int!, desc:String, officeId:Int): ClockAction
+
+    # Generate Random Data
+    genData(offices: Int!, users:Int!, clockActions:Int!): Int!
 }

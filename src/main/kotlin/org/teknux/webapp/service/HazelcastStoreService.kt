@@ -91,8 +91,8 @@ class HazelcastStoreService : IStoreService {
         return ids?.let {
             var result: MutableList<Office> = mutableListOf()
             it.forEach { result.add(officesMap[it]!!) }
-            result.pagesOrAll(paging)
-        } ?: officesMap.values.toList().pagesOrAll(paging)
+            result.sortedBy { it.id }.pagesOrAll(paging)
+        } ?: officesMap.values.toList().sortedBy { it.id }.pagesOrAll(paging)
     }
 
     override fun newUser(user: User): User {
@@ -122,7 +122,7 @@ class HazelcastStoreService : IStoreService {
     override fun getUsers(paging: Paging?): List<User> {
         LOGGER.trace("[${this.javaClass.simpleName}] getUsers()")
         val usersMap = hazelcastInstance.getMap<Int, User>(USER_MAP_NAME)
-        return usersMap.values.toList().pagesOrAll(paging)
+        return usersMap.values.sortedBy { it.id }.toList().pagesOrAll(paging)
     }
 
     override fun addAction(action: ClockAction): ClockAction {
@@ -160,18 +160,18 @@ class HazelcastStoreService : IStoreService {
     private fun fetchAllActions(paging: Paging? = null): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] fetchAllActions()")
         val actionsMap = hazelcastInstance.getMap<Int, MutableList<ClockAction>>(ACTION_MAP_NAME)
-        return actionsMap.values.stream().flatMap(MutableList<ClockAction>::stream).collect(Collectors.toList()).pagesOrAll(paging)
+        return actionsMap.values.stream().flatMap(MutableList<ClockAction>::stream).collect(Collectors.toList()).sortedBy { it.id }.pagesOrAll(paging)
     }
 
     override fun getActions(userId: Int, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] getActions(user=[$userId])")
         val actionsMap = hazelcastInstance.getMap<Int, MutableList<ClockAction>>(ACTION_MAP_NAME)
-        return actionsMap[userId]?.pagesOrAll(paging) ?: listOf()
+        return actionsMap[userId]?.sortedBy { it.id }?.pagesOrAll(paging) ?: listOf()
     }
 
     override fun getActions(userIds: Collection<Int>?, paging: Paging?): List<ClockAction> {
         LOGGER.trace("[${this.javaClass.simpleName}] getActions(userIds=[$userIds])")
-        return userIds?.let { fetchAllActions().filter { it.user.id in userIds }.pagesOrAll(paging) }
+        return userIds?.let { fetchAllActions().filter { it.user.id in userIds }.sortedBy { it.id }.pagesOrAll(paging) }
                 ?: fetchAllActions(paging)
     }
 

@@ -23,7 +23,7 @@ class DataGenerator(private val storeService: IStoreService) {
             officesSet.add(office)
             LOGGER.debug("Office ${office.name} created : ${office.id}")
         }
-        officesSet = storeService.getOffices() as MutableList<Office>
+        officesSet = storeService.getOffices().toMutableList()
 
         for (n in 1..users) {
             var user = storeService.newUser(User(name = "user_${UUID.randomUUID()}"))
