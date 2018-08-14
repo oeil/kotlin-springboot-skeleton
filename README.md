@@ -1,25 +1,17 @@
-# Standalone App(web) demonstrating Springboot, Kotlin, GraphQL and Hazelcast tech stack all together
+# Standalone App(web) demonstrating Springboot, Kotlin, GraphQL and Neo4J tech stack all together
 
-This branch uses Tomcat embedded as web-server (via springboot), GraphQL web services (in addition to REST) and :fire: **Hazelcast** :fire: as datastore (clustering support out-of-the box).
-
-You can spin-off multiple instances of this app to get data replaction of the store seamlessly. Each instance is automatically 'active', which means you can query (via GraphQL or REST) on either one - it just works.
+This branch uses Tomcat embedded as web-server (via springboot), GraphQL web services (in addition to REST) and :fire: **Neo4J** :fire: as datastore.
 
 ## Build Project
 ```
 mvn clean package
 ```
-## Get Started
-Get a built pre-release [here](https://github.com/oeil/kotlin-springboot-skeleton/releases/tag/untagged-73d8dc92ea7fb5c576c7)
 
 ###### Run one Application Instance on port 8080 (for REST & GraphQL endpoints)
 ```
-java -jar -Dport=8080 -Dstore=hazelcast target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
+java -jar -Dport=8080 -Dstore=neo4j -Djava.io.tmpdir=/tmp target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
 ```
 
-###### Run second Application Instance (on port 9090) & generate initial data (100 offices, 100 users, 10 clock in/out actions per user. Data get sync automatically across all other running instances (local or remote on same network)
-```
-java -jar -Dport=9090 -Dstore=hazelcast -DgenData="offices:100|users:100|actions:10" target/kotlin-springboot-skeleton-1.0.0-SNAPSHOT.jar
-```
 
 ###### GraphQL Playground on current schema (powered by GraphiQL)
 ```
