@@ -1,18 +1,15 @@
 package org.teknux.webapp.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import javax.persistence.*
+import org.neo4j.ogm.annotation.*
 
-@Entity
+@NodeEntity
 class User(
-        @Id
-        @Column(unique = true, nullable = false)
-        var id: Int? = null,
-
-        @Column(unique = true, nullable = false)
-        var name: String,
-
+        @Id @GeneratedValue
+        var id: Long? = null,
+        @Index(unique = true)
+        var name: String? = null,
         @JsonIgnore
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = [CascadeType.ALL] )
+        @Relationship(direction = Relationship.INCOMING)
         var clockActions: MutableList<ClockAction>? = null
 )

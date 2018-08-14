@@ -19,22 +19,22 @@ type Office {
 
 input Paging {
     limit: Int!
-    offset: Int!
+    page: Int!
 }
 
 # Schema's root Query Types (fetch data)
 type Query {
     # Get a list of Offices, support filter on Office's id
-    offices(id: Int, paging: Paging): [Office]!
+    offices(id: Long, paging: Paging): [Office]!
 
     # Get list of Users, supports filter on User's id
-    users(id: Int, paging: Paging): [User]!
+    users(id: Long, paging: Paging): [User]!
 
     # Get list of ClockAction, supports filter on User's id
-    clockActions(userId: Int, paging: Paging): [ClockAction]!
+    clockActions(userId: Long, paging: Paging): [ClockAction]!
 
     # Get the last ClockAction performed for given User id
-    lastClockAction(userId: Int): ClockAction!
+    lastClockAction(userId: Long): ClockAction!
 }
 
 # Schema's root Mutation Types (create/update/delete data)
@@ -46,10 +46,10 @@ type Mutation {
     office(name: String!) : Office!
 
     # Clock user id In
-    clockIn(userId: Int!, desc:String, officeId:Int): ClockAction
+    clockIn(userId: Long!, desc:String, officeId:Long): ClockAction
 
     # Clock user id Out
-    clockOut(userId: Int!, desc:String, officeId:Int): ClockAction
+    clockOut(userId: Long!, desc:String, officeId:Long): ClockAction
 
     # Generate Random Data
     genData(offices: Int!, users:Int!, clockActions:Int!): Int!

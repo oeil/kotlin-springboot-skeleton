@@ -19,13 +19,13 @@ class Mutation(private val storeService: IStoreService) : GraphQLMutationResolve
         return storeService.newUser(User(name = name))
     }
 
-    fun clockIn(userId: Int, desc: String?, officeId: Int): ClockAction {
+    fun clockIn(userId: Long, desc: String?, officeId: Long): ClockAction {
         val user = storeService.getUser(userId);
         val office = storeService.getOffice(officeId);
         return storeService.addAction(ClockAction(user = user, type = 1, description = desc ?: "in", office = office))
     }
 
-    fun clockOut(userId: Int, desc: String?, officeId: Int): ClockAction {
+    fun clockOut(userId: Long, desc: String?, officeId: Long): ClockAction {
         val user = storeService.getUser(userId);
         val office = storeService.getOffice(officeId);
         return storeService.addAction(ClockAction(user = user, type = 0, description = desc ?: "out", office = office))

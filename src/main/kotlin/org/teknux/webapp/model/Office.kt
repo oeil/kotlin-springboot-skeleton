@@ -1,15 +1,12 @@
 package org.teknux.webapp.model
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
+import com.fasterxml.jackson.annotation.JsonIgnore
+import org.neo4j.ogm.annotation.Relationship
 
-@Entity
-class Office(
-        @Id
-        @Column(unique = true, nullable = false)
-        var id: Int? = null,
-
-        @Column(unique = true, nullable = false)
-        var name: String?
+data class Office(
+        var id: Long? = null,
+        var name: String? = null,
+        @JsonIgnore
+        @Relationship(direction = Relationship.INCOMING)
+        var clockActions: MutableList<ClockAction>? = null
 )

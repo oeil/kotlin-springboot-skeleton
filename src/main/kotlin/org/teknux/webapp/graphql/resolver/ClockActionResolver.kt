@@ -7,11 +7,10 @@ import org.springframework.stereotype.Component
 import org.teknux.webapp.graphql.dataloader.OfficeIdsToOfficesDataLoader
 import org.teknux.webapp.model.ClockAction
 import org.teknux.webapp.model.Office
-import org.teknux.webapp.service.IStoreService
 import java.util.concurrent.CompletableFuture
 
 @Component
-class ClockActionResolver(private val storeService: IStoreService): GraphQLResolver<ClockAction> {
+class ClockActionResolver: GraphQLResolver<ClockAction> {
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(ClockActionResolver::class.java)
@@ -22,6 +21,6 @@ class ClockActionResolver(private val storeService: IStoreService): GraphQLResol
 
     fun getOffice(clockAction: ClockAction): CompletableFuture<Office> {
         LOGGER.debug("[GraphQL Resolver] getOffice(clockAction=[$clockAction])")
-        return officeIdsToOffices.load(clockAction.office.id)
+        return officeIdsToOffices.load(clockAction.office!!.id)
     }
 }

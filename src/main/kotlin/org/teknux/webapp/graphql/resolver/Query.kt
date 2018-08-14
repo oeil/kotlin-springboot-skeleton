@@ -18,14 +18,14 @@ class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
         private val LOGGER = LoggerFactory.getLogger(Query::class.java)
     }
 
-    fun offices(id: Int?, paging: Paging?): Iterable<Office> {
+    fun offices(id: Long?, paging: Paging?): Iterable<Office> {
         val stopWatch = StopWatch().start()
         val result = storeService.getOffices(id?.let { setOf(id) }, paging)
         LOGGER.debug("[GraphQL QUERY] offices(id=$id) - (processed in ${stopWatch.elapsed(TimeUnit.SECONDS)}s)")
         return result
     }
 
-    fun users(id: Int?, paging: Paging?): Iterable<User> {
+    fun users(id: Long?, paging: Paging?): Iterable<User> {
         val stopWatch = StopWatch().start()
 
         val result = id?.let {
@@ -36,7 +36,7 @@ class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
         return result
     }
 
-    fun clockActions(userId: Int?, paging: Paging?): Iterable<ClockAction> {
+    fun clockActions(userId: Long?, paging: Paging?): Iterable<ClockAction> {
         val stopWatch = StopWatch().start()
 
         val result = userId?.let {
@@ -47,7 +47,7 @@ class Query(private val storeService: IStoreService) : GraphQLQueryResolver {
         return result
     }
 
-    fun lastClockAction(userId: Int): ClockAction {
+    fun lastClockAction(userId: Long): ClockAction {
         var stopWatch = StopWatch().start()
         val result = storeService.getLastAction(userId)
 

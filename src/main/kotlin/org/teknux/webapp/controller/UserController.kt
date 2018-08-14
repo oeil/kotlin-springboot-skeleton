@@ -21,7 +21,7 @@ class UserController {
     }
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable id: Int): ResponseEntity<User> {
+    fun getUser(@PathVariable id: Long): ResponseEntity<User> {
         return storeService.getUser(id)?.let {
             ResponseEntity.ok(it)
         } ?: ResponseEntity(HttpStatus.NOT_FOUND)
